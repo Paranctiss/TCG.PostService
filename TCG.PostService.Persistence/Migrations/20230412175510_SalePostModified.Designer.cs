@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TCG.PostService.Persistence;
 
@@ -10,9 +11,11 @@ using TCG.PostService.Persistence;
 namespace TCG.PostService.Persistence.Migrations
 {
     [DbContext(typeof(ServiceDbContext))]
-    partial class ServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230412175510_SalePostModified")]
+    partial class SalePostModified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,9 +308,8 @@ namespace TCG.PostService.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("ItemId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()

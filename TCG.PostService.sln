@@ -1,5 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCG.PostService.API", "TCG.PostService.API\TCG.PostService.API.csproj", "{873660E1-9AEE-40A4-A0CC-E26991AC2175}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCG.PostService.Domain", "TCG.PostService.Domain\TCG.PostService.Domain.csproj", "{9284D212-DAF9-4409-94B9-317464618150}"

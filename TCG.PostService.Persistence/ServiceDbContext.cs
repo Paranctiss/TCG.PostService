@@ -84,8 +84,12 @@ public class ServiceDbContext : DbContext
                 .WithMany(s => s.MerchPosts)
                 .HasForeignKey(p => p.StatePostId)
                 .IsRequired();
-            
-            
+            modelBuilder.Entity<MerchPost>()
+                .HasDiscriminator<string>("Discriminator")
+                .HasValue<MerchPost>("MerchPost")
+                .HasValue<SalePost>("SalePost");
+
+
             modelBuilder.Entity<Reward>()
                 .HasOne(p => p.RewardType)
                 .WithMany(s => s.Rewards)
@@ -106,17 +110,17 @@ public class ServiceDbContext : DbContext
                 .IsRequired();
             
             modelBuilder.Entity<LotPost>();
+            
             modelBuilder.Entity<SalePost>();
+            
             modelBuilder.Entity<AttribuedReward>();
             
             modelBuilder.Entity<SaleLotPost>()
                 .HasKey(ls => new { ls.LotPostId, ls.SalePostId });
-            
             modelBuilder.Entity<SaleLotPost>()
                 .HasOne(ls => ls.LotPost)
                 .WithMany(lp => lp.SaleLotPosts)
                 .HasForeignKey(ls => ls.LotPostId);
-            
             modelBuilder.Entity<SaleLotPost>()
                 .HasOne(ls => ls.SalePost)
                 .WithMany(sp => sp.SaleLotPosts)
