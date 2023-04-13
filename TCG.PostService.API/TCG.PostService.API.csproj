@@ -20,14 +20,12 @@
         <PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="TCG.Common" Version="1.2.0" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\TCG.PostService.Application\TCG.PostService.Application.csproj" />
-      <ProjectReference Include="..\TCG.PostService.Persistence\TCG.PostService.Persistence.csproj" />
-      <ProjectReference Include="..\TCG.Common\TCG.Common\TCG.Common.csproj">
-        <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-      </ProjectReference>
+        <ProjectReference Include="..\TCG.PostService.Persistence\TCG.PostService.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

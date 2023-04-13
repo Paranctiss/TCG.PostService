@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TCG.Common\TCG.Common\TCG.Common.csproj" />
       <ProjectReference Include="..\TCG.PostService.Domain\TCG.PostService.Domain.csproj" />
     </ItemGroup>
 
@@ -22,6 +21,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.0" />
+      <PackageReference Include="TCG.Common" Version="1.2.0" />
     </ItemGroup>
 
 </Project>
