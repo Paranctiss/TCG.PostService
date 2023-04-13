@@ -7,7 +7,14 @@ namespace TCG.PostService.Persistence.Repositories;
 
 public class SearchPostRepository : Repository<SearchPost>, ISearchPostRepository
 {
+    protected readonly ServiceDbContext _dbContext;
     public SearchPostRepository(ServiceDbContext dbContext) : base(dbContext)
     {
+        _dbContext = dbContext;
+    }
+
+    public async Task<IEnumerable<SearchPost>> GetAllSearchPostPublicAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext.SearchPosts.Where(x => x.IsPublic == true).ToListAsync();
     }
 }

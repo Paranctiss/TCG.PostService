@@ -1,0 +1,3 @@
+[submodule "TCG.Common"]
+	path = TCG.Common
+	url = https://ProjetCSC@dev.azure.com/ProjetCSC/Projet%20CSC/_git/TCG.Common

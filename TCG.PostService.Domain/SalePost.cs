@@ -5,9 +5,11 @@ namespace TCG.PostService.Domain;
 
 public class SalePost : MerchPost
 {
-    public int ItemId { get; set; }
+    public string ItemId { get; set; }
 
     public int GradingId { get; set; }
+    public string Name { get; set; }
+    public string Image { get; set; }
     public Grading Grading { get; set; }
 
     public ICollection<SalePicturePost> SalePicturePosts { get; set; }

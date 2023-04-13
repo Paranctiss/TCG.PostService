@@ -1,9 +1,7 @@
-using System.Reflection;
 using Mapster;
 using MapsterMapper;
 using TCG.Common.MySqlDb;
 using TCG.PostService.Application;
-using TCG.PostService.Domain;
 using TCG.PostService.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +16,7 @@ builder.Services.AddSingleton(config);
 builder.Services.AddApplication();
 builder.Services.AddPersistence<ServiceDbContext>(builder.Configuration);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
+builder.Services.AddMassTransitWithRabbitMQ();
 
 var app = builder.Build();
 
