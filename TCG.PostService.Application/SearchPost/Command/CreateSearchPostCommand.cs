@@ -7,6 +7,7 @@ using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.DTO;
 using TCG.PostService.Application.SearchPost.DTO.Response;
+using TCG.PostService.Domain;
 
 namespace TCG.PostService.Application.SearchPost.Command;
 
@@ -27,14 +28,16 @@ public class CreateSearchPostCommandHandler : IRequestHandler<CreateSearchPostCo
 {
     private readonly ILogger<CreateSearchPostCommandHandler> _logger;
     private readonly ISearchPostRepository _repository;
+    private readonly IGradingRepository _gradingRepository;
     private readonly IRequestClient<PostCreated> _requestClient;
     private readonly IMapper _mapper;
 
-    public CreateSearchPostCommandHandler(IMapper mapper, IRequestClient<PostCreated> requestClient, ILogger<CreateSearchPostCommandHandler> logger, ISearchPostRepository dbService)
+    public CreateSearchPostCommandHandler(IMapper mapper, IRequestClient<PostCreated> requestClient, ILogger<CreateSearchPostCommandHandler> logger, ISearchPostRepository dbService, IGradingRepository gradingRepository)
     {
         _requestClient = requestClient;
         _logger = logger;
         _repository = dbService;
+        _gradingRepository = gradingRepository;
         _mapper = mapper;
     }
     public async Task<SearchPostDtoResponse> Handle(CreateSearchPostCommand request, CancellationToken cancellationToken)
@@ -53,12 +56,14 @@ public class CreateSearchPostCommandHandler : IRequestHandler<CreateSearchPostCo
                 StatePostId = request.SearchPostDtoRequest.StatePostId,
                 UserId = request.SearchPostDtoRequest.UserId,
                 Image = itemFromCatalog.Message.Image,
+                GradingId = request.SearchPostDtoRequest.GradingId,
                 Name = itemFromCatalog.Message.Name
             };
 
             await _repository.AddAsync(searchPost, cancellationToken);
             _logger.LogInformation("Creating a search post with serch post id {Id}", searchPost.Id);
-            return _mapper.Map<SearchPostDtoResponse>(searchPost); 
+            var mapped = _mapper.Map<SearchPostDtoResponse>(searchPost);
+            return mapped;
         }
         catch (Exception e)
         {

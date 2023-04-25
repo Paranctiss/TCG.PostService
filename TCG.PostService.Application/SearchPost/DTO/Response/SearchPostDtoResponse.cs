@@ -1,3 +1,5 @@
+using TCG.PostService.Domain;
+
 namespace TCG.PostService.Application.SearchPost.DTO.Response;
 
 public class SearchPostDtoResponse
@@ -11,4 +13,6 @@ public class SearchPostDtoResponse
     public int UserId { get; set; }
     public string Image { get; set; }
     public string Name { get; set; }
+    public virtual GradingDtoResponse Grading { get; set; }
+    public int GradingId { get; set; }
 }

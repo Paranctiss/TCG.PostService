@@ -1,10 +1,13 @@
 using System.Reflection;
+using Mapster;
+using MapsterMapper;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TCG.Common.MassTransit.Messages;
 using TCG.Common.Settings;
+using TCG.PostService.Application.SearchPost.DTO.Response;
 
 namespace TCG.PostService.Application;
 
@@ -36,5 +39,17 @@ public static class DependencyInjection
         //Start rabbitmq bus pour exanges
         serviceCollection.AddMassTransitHostedService();
         return serviceCollection;
+    }
+
+    public static IServiceCollection AddMapper(this IServiceCollection services)
+    {
+        var config = new TypeAdapterConfig();
+
+        config.NewConfig<Domain.SearchPost, SearchPostDtoResponse>()
+        .Map(dest => dest.Grading, src => src.Grading);
+
+        services.AddSingleton(config);
+        services.AddScoped<IMapper, ServiceMapper>();
+        return services;
     }
 }

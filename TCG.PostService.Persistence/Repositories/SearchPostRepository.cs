@@ -15,6 +15,6 @@ public class SearchPostRepository : Repository<SearchPost>, ISearchPostRepositor
 
     public async Task<IEnumerable<SearchPost>> GetAllSearchPostPublicAsync(CancellationToken cancellationToken)
     {
-        return await _dbContext.SearchPosts.Where(x => x.IsPublic == true).ToListAsync();
+        return await _dbContext.SearchPosts.Include(s => s.Grading).Where(x => x.IsPublic == true).ToListAsync();
     }
 }

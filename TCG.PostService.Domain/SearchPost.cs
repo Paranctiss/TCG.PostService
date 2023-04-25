@@ -12,10 +12,12 @@ public class SearchPost
     public string Image { get; set; }
     public string Name { get; set; }
     public ICollection<OfferPost> OfferPosts { get; set; }
+    public virtual Grading Grading { get; set; }
+    public int GradingId { get; set; }
 
     [Column(TypeName = "char(1)")]
     public char StatePostId { get; set; }
-    public StatePost StatePost { get; set; }
+    public virtual StatePost StatePost { get; set; }
 
     public int UserId { get; set; }
 }
