@@ -1,5 +1,6 @@
 using Mapster;
 using MapsterMapper;
+using TCG.Common.Middlewares.MiddlewareException;
 using TCG.Common.MySqlDb;
 using TCG.PostService.Application;
 using TCG.PostService.Persistence;
@@ -32,5 +33,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.ConfigureCustomExceptionMiddleware();
 
 app.Run();

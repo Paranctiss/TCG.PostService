@@ -25,19 +25,8 @@ public class SalePostController : ControllerBase
     public async Task<IActionResult> PostSalePost([FromBody] SalePostDtoRequest salePostDtoRequest,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var salePost = await _mediator.Send(new CreateSalePostCommand(salePostDtoRequest), cancellationToken);
-            return CreatedAtAction(nameof(GetSalePost), new { id = salePost.Id }, salePost);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
+        var salePost = await _mediator.Send(new CreateSalePostCommand(salePostDtoRequest), cancellationToken);
+        return CreatedAtAction(nameof(GetSalePost), new { id = salePost.Id }, salePost);
     }
 
     [HttpGet("{id}")]
@@ -47,7 +36,7 @@ public class SalePostController : ControllerBase
 
         return salePost != null ? Ok(salePost) : NotFound();
     }
-    
+
     [HttpGet("public")]
     public async Task<IActionResult> GetSearchPostPublic(CancellationToken cancellationToken)
     {
