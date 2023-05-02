@@ -67,6 +67,7 @@ public class ServiceDbContext : DbContext
                 .WithMany(s => s.OfferPosts)
                 .HasForeignKey(p => p.SearchPostId)
                 .IsRequired(false);
+
             modelBuilder.Entity<OfferPost>()
                 .HasOne(p => p.MerchPost)
                 .WithMany(s => s.OfferPosts)
@@ -78,7 +79,13 @@ public class ServiceDbContext : DbContext
                 .WithMany(s => s.SearchPosts)
                 .HasForeignKey(p => p.StatePostId)
                 .IsRequired();
-            
+
+            modelBuilder.Entity<SearchPost>()
+                .HasOne(p => p.Grading)
+                .WithMany(s => s.SearchPosts)
+                .HasForeignKey(p => p.GradingId)
+                .IsRequired();
+
             modelBuilder.Entity<MerchPost>()
                 .HasOne(p => p.StatePost)
                 .WithMany(s => s.MerchPosts)
@@ -88,7 +95,6 @@ public class ServiceDbContext : DbContext
                 .HasDiscriminator<string>("Discriminator")
                 .HasValue<MerchPost>("MerchPost")
                 .HasValue<SalePost>("SalePost");
-
 
             modelBuilder.Entity<Reward>()
                 .HasOne(p => p.RewardType)

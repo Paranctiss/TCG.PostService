@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace TCG.PostService.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class SearchPostGUID : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -95,18 +96,26 @@ namespace TCG.PostService.Persistence.Migrations
                 name: "SearchPosts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    ItemId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    ItemId = table.Column<string>(type: "longtext", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Remarks = table.Column<string>(type: "longtext", nullable: false),
                     IsPublic = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Image = table.Column<string>(type: "longtext", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    GradingId = table.Column<int>(type: "int", nullable: false),
                     StatePostId = table.Column<string>(type: "char(1)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SearchPosts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SearchPosts_Gradings_GradingId",
+                        column: x => x.GradingId,
+                        principalTable: "Gradings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SearchPosts_StatePosts_StatePostId",
                         column: x => x.StatePostId,
@@ -149,8 +158,10 @@ namespace TCG.PostService.Persistence.Migrations
                     StatePostId = table.Column<string>(type: "char(1)", nullable: false),
                     Discriminator = table.Column<string>(type: "longtext", nullable: false),
                     RewardId = table.Column<int>(type: "int", nullable: true),
-                    ItemId = table.Column<int>(type: "int", nullable: true),
-                    GradingId = table.Column<int>(type: "int", nullable: true)
+                    ItemId = table.Column<string>(type: "longtext", nullable: true),
+                    GradingId = table.Column<int>(type: "int", nullable: true),
+                    Name = table.Column<string>(type: "longtext", nullable: true),
+                    Image = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -186,7 +197,7 @@ namespace TCG.PostService.Persistence.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OfferStatePostId = table.Column<string>(type: "char(1)", nullable: false),
                     MerchPostId = table.Column<int>(type: "int", nullable: false),
-                    SearchPostId = table.Column<int>(type: "int", nullable: true)
+                    SearchPostId = table.Column<Guid>(type: "char(36)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -306,6 +317,11 @@ namespace TCG.PostService.Persistence.Migrations
                 name: "IX_SalePostLots_SalePostId",
                 table: "SalePostLots",
                 column: "SalePostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SearchPosts_GradingId",
+                table: "SearchPosts",
+                column: "GradingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SearchPosts_StatePostId",

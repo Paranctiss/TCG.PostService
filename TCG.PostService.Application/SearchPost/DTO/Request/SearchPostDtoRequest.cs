@@ -7,5 +7,6 @@ public class SearchPostDtoRequest
     public string Remarks { get; set; }
     public bool IsPublic { get; set; }
     public char StatePostId { get; set; }
+    public int GradingId { get; set; }
     public int UserId { get; set; }
 }

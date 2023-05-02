@@ -8,7 +8,7 @@ using TCG.PostService.Application.SearchPost.DTO.Response;
 
 namespace TCG.PostService.Application.SearchPost.Query;
 
-public record GetSearchPostQuery(int id) : IRequest<SearchPostDtoResponse>;
+public record GetSearchPostQuery(Guid id) : IRequest<SearchPostDtoResponse>;
 
 public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, SearchPostDtoResponse>
 {
@@ -27,7 +27,7 @@ public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, Sea
     {
         try
         {
-            var searchPost = await _repository.GetByIdAsync(request.id, cancellationToken);
+            var searchPost = await _repository.GetByGUIDAsync(request.id, cancellationToken);
 
             if (searchPost == null)
             {

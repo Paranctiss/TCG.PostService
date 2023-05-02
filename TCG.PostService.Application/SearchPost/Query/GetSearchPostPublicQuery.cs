@@ -1,6 +1,7 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using MySqlX.XDevAPI.Common;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.DTO.Response;
 
@@ -12,27 +13,29 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
 {
     private readonly ILogger<GetSearchPostPublicQueryHandler> _logger;
     private readonly ISearchPostRepository _repository;
+    private readonly IGradingRepository _gradingRepository;
     private readonly IMapper _mapper;
 
-    public GetSearchPostPublicQueryHandler(ILogger<GetSearchPostPublicQueryHandler> logger, ISearchPostRepository repository, IMapper mapper)
+    public GetSearchPostPublicQueryHandler(ILogger<GetSearchPostPublicQueryHandler> logger, ISearchPostRepository repository, IGradingRepository gradingRepository, IMapper mapper)
     {
         _logger = logger;
         _repository = repository;
+        _gradingRepository = gradingRepository;
         _mapper = mapper;
     }
     public async Task<IEnumerable<SearchPostDtoResponse>> Handle(GetSearchPostPublicQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var searchPost = await _repository.GetAllSearchPostPublicAsync(cancellationToken);
+            var searchPosts = await _repository.GetAllSearchPostPublicAsync(cancellationToken);
 
-            if (searchPost == null)
+            if (searchPosts == null)
             {
                 _logger.LogWarning("No public search post found");
                 return null;
             }
 
-            var searchPostDto = _mapper.Map<IEnumerable<SearchPostDtoResponse>>(searchPost);
+            var searchPostDto = _mapper.Map<IEnumerable<SearchPostDtoResponse>>(searchPosts);
 
             return searchPostDto;
         }

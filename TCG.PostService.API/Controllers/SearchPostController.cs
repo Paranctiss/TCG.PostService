@@ -14,35 +14,24 @@ public class SearchPostController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    
+
     public SearchPostController(IMediator mediator, IMapper mapper)
     {
         _mediator = mediator;
         _mapper = mapper;
     }
-    
+
     [HttpPost("add")]
     public async Task<IActionResult> CreateOfferPost([FromBody] SearchPostDtoRequest searchPostDto, CancellationToken cancellationToken)
     {
-        try
-        {
-            var command = new CreateSearchPostCommand(searchPostDto);
-            var result = await _mediator.Send(command, cancellationToken);
+        var command = new CreateSearchPostCommand(searchPostDto);
+        var result = await _mediator.Send(command, cancellationToken);
 
-            return CreatedAtAction(nameof(GetSearchPost), new { id = result.Id }, result);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
+        return CreatedAtAction(nameof(GetSearchPost), new { id = result.Id }, result);
     }
-    
+
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetSearchPost(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSearchPost(Guid id, CancellationToken cancellationToken)
     {
         var searchPost = await _mediator.Send(new GetSearchPostQuery(id), cancellationToken);
 
@@ -52,7 +41,7 @@ public class SearchPostController : ControllerBase
         }
         return Ok(searchPost);
     }
-    
+
     [HttpGet("public")]
     public async Task<IActionResult> GetSearchPostPublic(CancellationToken cancellationToken)
     {

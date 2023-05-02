@@ -11,8 +11,8 @@ using TCG.PostService.Persistence;
 namespace TCG.PostService.Persistence.Migrations
 {
     [DbContext(typeof(ServiceDbContext))]
-    [Migration("20230412175510_SalePostModified")]
-    partial class SalePostModified
+    [Migration("20230426134133_SearchPostGUID")]
+    partial class SearchPostGUID
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,8 +113,8 @@ namespace TCG.PostService.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("SearchPostId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SearchPostId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
@@ -223,8 +223,11 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.SearchPost", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("GradingId")
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
@@ -257,6 +260,8 @@ namespace TCG.PostService.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GradingId");
 
                     b.HasIndex("StatePostId");
 
@@ -308,8 +313,9 @@ namespace TCG.PostService.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -406,11 +412,19 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.SearchPost", b =>
                 {
+                    b.HasOne("TCG.PostService.Domain.Grading", "Grading")
+                        .WithMany("SearchPosts")
+                        .HasForeignKey("GradingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TCG.PostService.Domain.StatePost", "StatePost")
                         .WithMany("SearchPosts")
                         .HasForeignKey("StatePostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Grading");
 
                     b.Navigation("StatePost");
                 });
@@ -436,6 +450,8 @@ namespace TCG.PostService.Persistence.Migrations
             modelBuilder.Entity("TCG.PostService.Domain.Grading", b =>
                 {
                     b.Navigation("SalePosts");
+
+                    b.Navigation("SearchPosts");
                 });
 
             modelBuilder.Entity("TCG.PostService.Domain.MerchPost", b =>
