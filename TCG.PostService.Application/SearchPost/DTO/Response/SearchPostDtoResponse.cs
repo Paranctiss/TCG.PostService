@@ -4,7 +4,7 @@ namespace TCG.PostService.Application.SearchPost.DTO.Response;
 
 public class SearchPostDtoResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string ItemId { get; set; }
     public decimal Price { get; set; }
     public string Remarks { get; set; }

@@ -110,8 +110,8 @@ namespace TCG.PostService.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("SearchPostId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SearchPostId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
@@ -220,9 +220,9 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.SearchPost", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("GradingId")
                         .HasColumnType("int");

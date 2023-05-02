@@ -18,6 +18,6 @@ public class OfferPost
     public MerchPost MerchPost { get; set; }
 
 
-    public int? SearchPostId { get; set; }
+    public Guid? SearchPostId { get; set; }
     public SearchPost SearchPost { get; set; }
 }

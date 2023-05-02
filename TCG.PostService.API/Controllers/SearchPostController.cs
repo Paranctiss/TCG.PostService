@@ -31,7 +31,7 @@ public class SearchPostController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetSearchPost(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSearchPost(Guid id, CancellationToken cancellationToken)
     {
         var searchPost = await _mediator.Send(new GetSearchPostQuery(id), cancellationToken);
 

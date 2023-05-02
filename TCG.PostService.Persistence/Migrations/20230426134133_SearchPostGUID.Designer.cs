@@ -11,8 +11,8 @@ using TCG.PostService.Persistence;
 namespace TCG.PostService.Persistence.Migrations
 {
     [DbContext(typeof(ServiceDbContext))]
-    [Migration("20230425091914_SearchPostGrading")]
-    partial class SearchPostGrading
+    [Migration("20230426134133_SearchPostGUID")]
+    partial class SearchPostGUID
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,8 +113,8 @@ namespace TCG.PostService.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("SearchPostId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SearchPostId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
@@ -223,9 +223,9 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.SearchPost", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("GradingId")
                         .HasColumnType("int");
