@@ -15,4 +15,6 @@ public class SearchPostDtoResponse
     public string Name { get; set; }
     public virtual GradingDtoResponse Grading { get; set; }
     public int GradingId { get; set; }
+
+    public bool Liked { get; set; }
 }

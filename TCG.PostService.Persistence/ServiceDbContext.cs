@@ -32,6 +32,7 @@ public class ServiceDbContext : DbContext
     public DbSet<SalePicturePost> SalePicturePosts { get; set; }
     public DbSet<Grading> Gradings { get; set; }
     public DbSet<RewardType> RewardTypes { get; set; }
+    public DbSet<LikedSearchPost> LikedSearchPosts { get; set; }
     
     public Task<int> SaveChangesAsync()
     {
@@ -131,7 +132,14 @@ public class ServiceDbContext : DbContext
                 .HasOne(ls => ls.SalePost)
                 .WithMany(sp => sp.SaleLotPosts)
                 .HasForeignKey(ls => ls.SalePostId);
-            
+
+            modelBuilder.Entity<LikedSearchPost>()
+            .HasKey(lsp => new { lsp.SearchPostId, lsp.UserId });
+            modelBuilder.Entity<LikedSearchPost>()
+            .HasOne(lsp => lsp.SearchPost)
+            .WithMany(sp => sp.LikedSearchPosts)
+            .HasForeignKey(lsp => lsp.SearchPostId);
+
         });
     }
 }

@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
                       {
                           builder
                             .WithOrigins("http://localhost:8100") // specifying the allowed origin
-                            .WithMethods("GET", "POST", "PUT") // defining the allowed HTTP method
+                            .WithMethods("GET", "POST", "PUT", "DELETE") // defining the allowed HTTP method
                             .AllowAnyHeader(); // allowing any header to be sent
                       });
 });
@@ -27,7 +27,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMapper();
+//builder.Services.AddMapper();
+var config = new TypeAdapterConfig();
+builder.Services.AddSingleton(config);
 builder.Services.AddApplication();
 builder.Services.AddPersistence<ServiceDbContext>(builder.Configuration);
 builder.Services.AddScoped<IMapper, ServiceMapper>();

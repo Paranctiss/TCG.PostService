@@ -53,4 +53,16 @@ public class SearchPostController : ControllerBase
         }
         return Ok(searchPost);
     }
+
+    [HttpGet("user/{id}/{nbMax}")]
+    public async Task<IActionResult> GetLastUserSearchPost(int id, int nbMax, CancellationToken cancellationToken)
+    {
+        var searchPost = await _mediator.Send(new GetUserSearchPostQuery(id, nbMax), cancellationToken);
+
+        if (searchPost == null)
+        {
+            return NotFound();
+        }
+        return Ok(searchPost);
+    }
 }

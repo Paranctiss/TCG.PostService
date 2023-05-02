@@ -27,7 +27,7 @@ public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, Sea
     {
         try
         {
-            var searchPost = await _repository.GetByGUIDAsync(request.id, cancellationToken);
+            var searchPost = await _repository.GetSingleSearchPostAsync(cancellationToken, request.id);
 
             if (searchPost == null)
             {
