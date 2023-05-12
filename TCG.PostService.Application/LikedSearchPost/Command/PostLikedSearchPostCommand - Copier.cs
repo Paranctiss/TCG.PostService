@@ -50,7 +50,7 @@ namespace TCG.PostService.Application.LikedSearchPost.Command
         {
             try
             {
-                Domain.LikedSearchPost likedSearchPost = new()
+                Domain.LikedSearchPosts likedSearchPost = new()
                 {
                     LikeAt = DateTime.Now,
                     SearchPostId = request.LikedSearchPostDtoRequest.SearchPostId,

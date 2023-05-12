@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TCG.PostService.Domain
 {
-    public class LikedSearchPost
+    public class LikedSearchPosts
     {
         public Guid SearchPostId;
         public int UserId;

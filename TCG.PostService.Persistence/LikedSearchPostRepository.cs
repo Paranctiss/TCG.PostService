@@ -11,7 +11,7 @@ using TCG.PostService.Domain;
 
 namespace TCG.PostService.Persistence
 {
-    public class LikedSearchPostRepository : Repository<LikedSearchPost>, ILikedSearchPostRepository
+    public class LikedSearchPostRepository : Repository<LikedSearchPosts>, ILikedSearchPostRepository
     {
         protected readonly ServiceDbContext _dbContext;
         public LikedSearchPostRepository(ServiceDbContext dbContext) : base(dbContext)
@@ -19,7 +19,7 @@ namespace TCG.PostService.Persistence
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Domain.LikedSearchPost>> GetLikedSearchPostsByUserIdAsync(CancellationToken cancellationToken, int userId)
+        public async Task<IEnumerable<Domain.LikedSearchPosts>> GetLikedSearchPostsByUserIdAsync(CancellationToken cancellationToken, int userId)
         {
             return await _dbContext.LikedSearchPosts.Include(s => s.SearchPost).Include(g => g.SearchPost.Grading).Where(x => x.UserId == userId).ToListAsync();
         }

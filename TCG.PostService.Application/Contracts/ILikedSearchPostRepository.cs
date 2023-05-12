@@ -8,9 +8,9 @@ using TCG.PostService.Application.LikedSearchPost.DTO.Request;
 
 namespace TCG.PostService.Application.Contracts
 {
-    public interface ILikedSearchPostRepository : IRepository<Domain.LikedSearchPost>
+    public interface ILikedSearchPostRepository : IRepository<Domain.LikedSearchPosts>
     {
-        Task<IEnumerable<Domain.LikedSearchPost>> GetLikedSearchPostsByUserIdAsync(CancellationToken cancellationToken, int userId);
+        Task<IEnumerable<Domain.LikedSearchPosts>> GetLikedSearchPostsByUserIdAsync(CancellationToken cancellationToken, int userId);
 
         Task<LikedSearchPostDtoRequest> RemoveLikedSearchPosts(LikedSearchPostDtoRequest likedSearchPost, CancellationToken cancellationToken);
 
