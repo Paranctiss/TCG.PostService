@@ -9,7 +9,7 @@ namespace TCG.PostService.Persistence.Helpers
 {
     public class PictureHelper : IPictureHelper
     {
-        public static string DossierRacine { get; } = "C:/TCGPlace";
+        public static string DossierRacine { get; } = "/Users/val/Documents/Dev/TCG/SalePostPicture";
         public static string DossierPhoto { get; } = DossierRacine + "/PHOTO";
 
         public void PrepareToDownload()

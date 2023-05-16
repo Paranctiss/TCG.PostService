@@ -7,25 +7,37 @@ using TCG.PostService.Application.SalePost.DTO.Response;
 
 namespace TCG.PostService.Application.SalePost.Query;
 
-public record GetSalePostPublicQuery() : IRequest<IEnumerable<SalePostDtoResponse>>;
+public record GetSalePostPublicQuery(int pageNumber, int pageSize) : IRequest<IEnumerable<SalePostDtoResponse>>;
 
 public class GetSalePostPublicQueryHandler : IRequestHandler<GetSalePostPublicQuery, IEnumerable<SalePostDtoResponse>>
 {
     private readonly ILogger<GetSalePostPublicQueryHandler> _logger;
     private readonly ISalePostRepository _repository;
+    private readonly IPictureRepository _pictureRepository;
     private readonly IMapper _mapper;
 
-    public GetSalePostPublicQueryHandler(ILogger<GetSalePostPublicQueryHandler> logger, ISalePostRepository repository, IMapper mapper)
+    public GetSalePostPublicQueryHandler(
+        ILogger<GetSalePostPublicQueryHandler> logger, 
+        ISalePostRepository repository, 
+        IMapper mapper,
+        IPictureRepository pictureRepository)
     {
         _logger = logger;
         _repository = repository;
         _mapper = mapper;
+        _pictureRepository = pictureRepository;
     }
     public async Task<IEnumerable<SalePostDtoResponse>> Handle(GetSalePostPublicQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var salePost = await _repository.GetAllSalePostPublicAsync(cancellationToken);
+            var salePost = await _repository.GetAllSalePostPublicAsync(
+                request.pageNumber,
+                request.pageSize,
+                cancellationToken,
+                orderBy: x => x.CreatedAt,
+                descending: true,
+                filter: x => x.IsPublic);
 
             if (salePost == null)
             {
@@ -34,7 +46,6 @@ public class GetSalePostPublicQueryHandler : IRequestHandler<GetSalePostPublicQu
             }
 
             var salePostDto = _mapper.Map<IEnumerable<SalePostDtoResponse>>(salePost);
-
             return salePostDto;
         }
         catch (Exception ex)

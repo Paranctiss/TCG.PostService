@@ -39,9 +39,9 @@ public class SalePostController : ControllerBase
     }
 
     [HttpGet("public")]
-    public async Task<IActionResult> GetSalePostPublic(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSalePostPublic(CancellationToken cancellationToken, [FromQuery]int pageNumber = 1, [FromQuery]int pageSize = 10)
     {
-        var salePost = await _mediator.Send(new GetSalePostPublicQuery(), cancellationToken);
+        var salePost = await _mediator.Send(new GetSalePostPublicQuery(pageNumber, pageSize), cancellationToken);
 
         if (salePost == null)
         {

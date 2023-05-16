@@ -11,6 +11,5 @@ namespace TCG.PostService.Application.SalePictures.DTO.Response
         public int Id { get; set; }
         public string Name { get; set; }
         public int SalePostId { get; set; }
-
     }
 }

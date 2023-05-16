@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TCG.Common.MassTransit.Messages;
 using TCG.Common.Settings;
+using TCG.PostService.Application.SalePost.DTO.Response;
 using TCG.PostService.Application.SearchPost.DTO.Response;
 
 namespace TCG.PostService.Application;
@@ -46,8 +47,8 @@ public static class DependencyInjection
     {
         var config = new TypeAdapterConfig();
 
-        config.NewConfig<Domain.SearchPost, SearchPostDtoResponse>()
-        .Map(dest => dest.Grading, src => src.Grading);
+        config.NewConfig<Domain.SalePost, SalePostDtoResponse>()
+            .Map(dest => dest.SalePicturePosts, src => src.SalePicturePosts.Select(p => p.Name));
 
         services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();

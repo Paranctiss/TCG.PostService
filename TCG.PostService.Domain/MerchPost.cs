@@ -10,6 +10,7 @@ public class MerchPost
     public bool IsPublic { get; set; }
 
     public int UserId { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
     
     public ICollection<OfferPost> OfferPosts { get; set; }
     
