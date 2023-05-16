@@ -1,6 +1,7 @@
 using FluentValidation;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TCG.PostService.Application.SearchPost.Command;
 using TCG.PostService.Application.SearchPost.DTO;

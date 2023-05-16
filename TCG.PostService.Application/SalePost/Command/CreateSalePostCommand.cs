@@ -3,12 +3,11 @@ using MapsterMapper;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using TCG.Common.Contracts;
 using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
+using TCG.PostService.Application.IHelpers;
 using TCG.PostService.Application.SalePost.DTO.Request;
 using TCG.PostService.Application.SalePost.DTO.Response;
-using TCG.PostService.Application.SearchPost.DTO.Response;
 using TCG.PostService.Domain;
 
 namespace TCG.PostService.Application.SalePost.Command;
@@ -30,14 +29,18 @@ public class AddSalePostValidator : AbstractValidator<CreateSalePostCommand>
 public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostCommand, SalePostDtoResponse>
 {
     private readonly IRequestClient<PostCreated> _requestClient;
-    private readonly ISalePostRepository _repository;
+    private readonly ISalePostRepository _repositorySalePost;
+    private readonly IPictureRepository _repositoryPicture;
+    private readonly IPictureHelper _helper;
     private readonly IMapper _mapper;
     private readonly ILogger<CreateSalePostCommandHandler> _logger;
 
-    public CreateSalePostCommandHandler(IRequestClient<PostCreated> requestClient, ISalePostRepository repository, IMapper mapper, ILogger<CreateSalePostCommandHandler> logger)
+    public CreateSalePostCommandHandler(IRequestClient<PostCreated> requestClient, ISalePostRepository repositorySalePost, IPictureRepository repositoryPicture, IPictureHelper helper, IMapper mapper, ILogger<CreateSalePostCommandHandler> logger)
     {
         _requestClient = requestClient;
-        _repository = repository;
+        _repositorySalePost = repositorySalePost;
+        _repositoryPicture = repositoryPicture;
+        _helper = helper;
         _mapper = mapper;
         _logger = logger;
     }
@@ -46,9 +49,11 @@ public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostComman
     {
         try
         {
+
             var salePostCreatedMessage = new PostCreated(request.SalePostDtoRequest.ItemId);
             var itemFromCatalog = await _requestClient.GetResponse<PostCreatedResponse>(salePostCreatedMessage, cancellationToken);
 
+            //Création du sale post
             Domain.SalePost salePost = new()
             {
                 GradingId = request.SalePostDtoRequest.GradingId,
@@ -62,7 +67,32 @@ public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostComman
                 UserId = request.SalePostDtoRequest.UserId
             };
 
-            await _repository.AddAsync(salePost, cancellationToken);
+            await _repositorySalePost.ExecuteInTransactionAsync(async () =>
+            {
+                //Ajout du sale post dans BDD
+                await _repositorySalePost.AddAsync(salePost, cancellationToken);
+
+
+                //Parcours la liste des photos transmise avec le salepost
+                foreach (var pic in request.SalePostDtoRequest.Pictures)
+                {
+                    _helper.SavePicture(pic.Name, pic.Base64); //Enregistre la photo sur le serveur
+                    var dossier = _helper.GetDossierPhoto();
+
+                    //Création de l'objet photo
+                    Domain.SalePicturePost picture = new SalePicturePost()
+                    {
+                        //Name = DossierPhoto + "/" + requestP.PictureDtoRequest.Name + ".png",
+                        Name = dossier + "/" + pic.Name + ".webp",
+                        SalePostId = salePost.Id
+                    };
+
+                    //Ajout de la photo dans BDD
+                    await _repositoryPicture.AddAsync(picture, cancellationToken);
+                }
+
+            }, cancellationToken);
+            
             _logger.LogInformation("Creating a search post with sale post id {Id}", salePost.Id);
             return _mapper.Map<SalePostDtoResponse>(salePost);
         }

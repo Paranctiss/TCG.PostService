@@ -3,6 +3,7 @@ using MapsterMapper;
 using TCG.Common.Middlewares.MiddlewareException;
 using TCG.Common.MySqlDb;
 using TCG.PostService.Application;
+using TCG.PostService.Application.Contracts;
 using TCG.PostService.Persistence;
 
 
@@ -16,7 +17,7 @@ builder.Services.AddCors(options =>
                       builder =>
                       {
                           builder
-                            .WithOrigins("http://localhost:8100") // specifying the allowed origin
+                            .WithOrigins("http://localhost:4200") // specifying the allowed origin
                             .WithMethods("GET", "POST", "PUT", "DELETE") // defining the allowed HTTP method
                             .AllowAnyHeader(); // allowing any header to be sent
                       });
@@ -30,6 +31,7 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddMapper();
 var config = new TypeAdapterConfig();
 builder.Services.AddSingleton(config);
+builder.Services.AddPersistence();
 builder.Services.AddApplication();
 builder.Services.AddPersistence<ServiceDbContext>(builder.Configuration);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
