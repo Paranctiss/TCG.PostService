@@ -31,7 +31,7 @@ public class SalePostController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetSalePost(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSalePost(Guid id, CancellationToken cancellationToken)
     {
         var salePost = await _mediator.Send(new GetSalePostQuery(id), cancellationToken);
 

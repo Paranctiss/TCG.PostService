@@ -15,4 +15,5 @@ public class SalePost : MerchPost
     public ICollection<SalePicturePost> SalePicturePosts { get; set; }
 
     public ICollection<SaleLotPost> SaleLotPosts { get; set; }
+    public ICollection<LikedSalePosts> LikedSalePosts { get; set; }
 }

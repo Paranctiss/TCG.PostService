@@ -4,7 +4,7 @@ namespace TCG.PostService.Domain;
 
 public class MerchPost
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public decimal Price { get; set; }
     public string Remarks { get; set; }
     public bool IsPublic { get; set; }

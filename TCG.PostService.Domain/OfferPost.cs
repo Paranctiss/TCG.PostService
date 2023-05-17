@@ -14,7 +14,7 @@ public class OfferPost
     public OfferStatePost OfferStatePost { get; set; }
 
 
-    public int MerchPostId { get; set; }
+    public Guid MerchPostId { get; set; }
     public MerchPost MerchPost { get; set; }
 
 

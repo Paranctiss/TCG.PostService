@@ -53,6 +53,19 @@ namespace TCG.PostService.Persistence.Migrations
                     b.ToTable("Gradings");
                 });
 
+            modelBuilder.Entity("TCG.PostService.Domain.LikedSalePosts", b =>
+                {
+                    b.Property<Guid>("SalePostId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SalePostId", "UserId");
+
+                    b.ToTable("LikedSalePosts");
+                });
+
             modelBuilder.Entity("TCG.PostService.Domain.LikedSearchPosts", b =>
                 {
                     b.Property<Guid>("SearchPostId")
@@ -68,9 +81,9 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.MerchPost", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -116,8 +129,8 @@ namespace TCG.PostService.Persistence.Migrations
                     b.Property<int>("BuyerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MerchPostId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MerchPostId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("OfferStatePostId")
                         .IsRequired()
@@ -201,11 +214,11 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.SaleLotPost", b =>
                 {
-                    b.Property<int>("LotPostId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("LotPostId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<int>("SalePostId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SalePostId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("LotPostId", "SalePostId");
 
@@ -224,8 +237,8 @@ namespace TCG.PostService.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("SalePostId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SalePostId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -344,6 +357,17 @@ namespace TCG.PostService.Persistence.Migrations
                     b.HasOne("TCG.PostService.Domain.Reward", null)
                         .WithMany("AvailableRewards")
                         .HasForeignKey("RewardId");
+                });
+
+            modelBuilder.Entity("TCG.PostService.Domain.LikedSalePosts", b =>
+                {
+                    b.HasOne("TCG.PostService.Domain.SalePost", "SalePost")
+                        .WithMany("LikedSalePosts")
+                        .HasForeignKey("SalePostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalePost");
                 });
 
             modelBuilder.Entity("TCG.PostService.Domain.LikedSearchPosts", b =>
@@ -521,6 +545,8 @@ namespace TCG.PostService.Persistence.Migrations
 
             modelBuilder.Entity("TCG.PostService.Domain.SalePost", b =>
                 {
+                    b.Navigation("LikedSalePosts");
+
                     b.Navigation("SaleLotPosts");
 
                     b.Navigation("SalePicturePosts");

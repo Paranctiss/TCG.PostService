@@ -9,7 +9,7 @@ using TCG.PostService.Application.SearchPost.Query;
 namespace TCG.PostService.Application.SalePost.Query;
 
 
-public record GetSalePostQuery(int id) : IRequest<SalePostDtoResponse>;
+public record GetSalePostQuery(Guid id) : IRequest<SalePostDtoResponse>;
 
 public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePostDtoResponse>
 {
@@ -27,7 +27,7 @@ public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePos
     {
         try
         {
-            var salePost = await _repository.GetByIdAsync(request.id, cancellationToken);
+            var salePost = await _repository.GetByGUIDAsync(request.id, cancellationToken);
 
             if (salePost == null)
             {

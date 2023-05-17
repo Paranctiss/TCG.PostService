@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCG.PostService.Application.SalePictures.DTO.Response
+namespace TCG.PostService.Application.LikedSalePost.DTO.Request
 {
-    public class PictureDtoResponse
+    public class LikedSalePostDtoRequest
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
         public Guid SalePostId { get; set; }
-
+        public int UserId { get; set; }
     }
 }
