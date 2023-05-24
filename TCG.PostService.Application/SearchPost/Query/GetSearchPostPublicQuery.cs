@@ -13,14 +13,14 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
 {
     private readonly ILogger<GetSearchPostPublicQueryHandler> _logger;
     private readonly ISearchPostRepository _repository;
-    private readonly IGradingRepository _gradingRepository;
+    private readonly ILikedSearchPostRepository _likedSearchPostRepository;
     private readonly IMapper _mapper;
 
-    public GetSearchPostPublicQueryHandler(ILogger<GetSearchPostPublicQueryHandler> logger, ISearchPostRepository repository, IGradingRepository gradingRepository, IMapper mapper)
+    public GetSearchPostPublicQueryHandler(ILogger<GetSearchPostPublicQueryHandler> logger, ISearchPostRepository repository, ILikedSearchPostRepository likedSearchPostRepository, IMapper mapper)
     {
         _logger = logger;
         _repository = repository;
-        _gradingRepository = gradingRepository;
+        _likedSearchPostRepository = likedSearchPostRepository;
         _mapper = mapper;
     }
     public async Task<IEnumerable<SearchPostDtoResponse>> Handle(GetSearchPostPublicQuery request, CancellationToken cancellationToken)
@@ -35,7 +35,19 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
                 return null;
             }
 
-            var searchPostDto = _mapper.Map<IEnumerable<SearchPostDtoResponse>>(searchPosts);
+            var searchPostDto = _mapper.Map<List<SearchPostDtoResponse>>(searchPosts);
+
+            foreach(SearchPostDtoResponse searchPostDtoResponse in searchPostDto)
+            {
+                if(_likedSearchPostRepository.IsSearchPostLiked(cancellationToken, 1, searchPostDtoResponse.Id))
+                {
+                    searchPostDtoResponse.Liked = true;
+                }
+                else
+                {
+                    searchPostDtoResponse.Liked = false;
+                }
+            }
 
             return searchPostDto;
         }

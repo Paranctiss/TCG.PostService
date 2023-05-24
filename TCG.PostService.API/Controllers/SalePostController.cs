@@ -24,13 +24,14 @@ public class SalePostController : ControllerBase
     [HttpPost("add")]
     public async Task<IActionResult> PostSalePost([FromBody] SalePostDtoRequest salePostDtoRequest,
         CancellationToken cancellationToken)
+    
     {
         var salePost = await _mediator.Send(new CreateSalePostCommand(salePostDtoRequest), cancellationToken);
         return CreatedAtAction(nameof(GetSalePost), new { id = salePost.Id }, salePost);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetSalePost(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSalePost(Guid id, CancellationToken cancellationToken)
     {
         var salePost = await _mediator.Send(new GetSalePostQuery(id), cancellationToken);
 
@@ -38,9 +39,9 @@ public class SalePostController : ControllerBase
     }
 
     [HttpGet("public")]
-    public async Task<IActionResult> GetSalePostPublic(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSalePostPublic(CancellationToken cancellationToken, [FromQuery]int pageNumber = 1, [FromQuery]int pageSize = 10)
     {
-        var salePost = await _mediator.Send(new GetSalePostPublicQuery(), cancellationToken);
+        var salePost = await _mediator.Send(new GetSalePostPublicQuery(pageNumber, pageSize), cancellationToken);
 
         if (salePost == null)
         {

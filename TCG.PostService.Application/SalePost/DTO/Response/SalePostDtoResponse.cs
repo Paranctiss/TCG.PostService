@@ -1,8 +1,10 @@
+using TCG.PostService.Domain;
+
 namespace TCG.PostService.Application.SalePost.DTO.Response;
 
 public class SalePostDtoResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public decimal Price { get; set; }
     public string Remarks { get; set; }
     public bool IsPublic { get; set; }
@@ -10,4 +12,5 @@ public class SalePostDtoResponse
     public int UserId { get; set; }
     public string Name { get; set; }
     public string Image { get; set; }
+    public ICollection<string> SalePicturePosts { get; set; }
 }

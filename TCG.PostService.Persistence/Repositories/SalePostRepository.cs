@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver.Linq;
 using TCG.Common.MySqlDb;
@@ -13,9 +14,36 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
     {
         _dbContext = dbContext;
     }
-
-    public async Task<IEnumerable<SalePost>> GetAllSalePostPublicAsync(CancellationToken cancellationToken)
+    
+    public async Task<IEnumerable<SalePost>> GetAllSalePostPublicAsync<TOrderKey>(
+        int pageNumber, int pageSize,
+        CancellationToken cancellationToken,
+        Expression<Func<SalePost, TOrderKey>> orderBy = null, 
+        bool descending = true, 
+        Expression<Func<SalePost,bool>> filter = null)
     {
-        return await _dbContext.SalePosts.Where(x => x.IsPublic == true).ToListAsync();
+        var query = _dbContext.Set<SalePost>().Include(sp => sp.SalePicturePosts).AsQueryable();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        
+        if (orderBy != null)
+        {
+            if (descending)
+            {
+                query = query.OrderByDescending(orderBy);
+            }
+            else
+            {
+                query = query.OrderBy(orderBy);
+            }
+        }
+        return await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
+    
 }

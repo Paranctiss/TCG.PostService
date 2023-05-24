@@ -1,6 +1,7 @@
 using FluentValidation;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TCG.PostService.Application.SearchPost.Command;
 using TCG.PostService.Application.SearchPost.DTO;
@@ -46,6 +47,18 @@ public class SearchPostController : ControllerBase
     public async Task<IActionResult> GetSearchPostPublic(CancellationToken cancellationToken)
     {
         var searchPost = await _mediator.Send(new GetSearchPostPublicQuery(), cancellationToken);
+
+        if (searchPost == null)
+        {
+            return NotFound();
+        }
+        return Ok(searchPost);
+    }
+
+    [HttpGet("user/{id}/{nbMax}")]
+    public async Task<IActionResult> GetLastUserSearchPost(int id, int nbMax, CancellationToken cancellationToken)
+    {
+        var searchPost = await _mediator.Send(new GetUserSearchPostQuery(id, nbMax), cancellationToken);
 
         if (searchPost == null)
         {

@@ -17,4 +17,15 @@ public class SearchPostRepository : Repository<SearchPost>, ISearchPostRepositor
     {
         return await _dbContext.SearchPosts.Include(s => s.Grading).Where(x => x.IsPublic == true).ToListAsync();
     }
+
+    public async Task<SearchPost> GetSingleSearchPostAsync(CancellationToken cancellationToken, Guid id)
+    {
+        return await _dbContext.SearchPosts.Include(s => s.Grading).FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+
+    public async Task<IEnumerable<SearchPost>> GetLastUserSearchPostAsync(int userId, int nbMax, CancellationToken cancellationToken)
+    {
+        return await _dbContext.SearchPosts.Include(s => s.Grading).Where(x => x.IsPublic == true).Where(u => u.UserId == userId).Take(nbMax).ToListAsync();
+    }
 }

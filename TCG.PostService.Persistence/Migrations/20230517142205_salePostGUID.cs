@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace TCG.PostService.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class SearchPostGUID : Migration
+    public partial class salePostGUID : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -149,12 +149,12 @@ namespace TCG.PostService.Persistence.Migrations
                 name: "MerchPosts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Remarks = table.Column<string>(type: "longtext", nullable: false),
                     IsPublic = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     StatePostId = table.Column<string>(type: "char(1)", nullable: false),
                     Discriminator = table.Column<string>(type: "longtext", nullable: false),
                     RewardId = table.Column<int>(type: "int", nullable: true),
@@ -187,6 +187,44 @@ namespace TCG.PostService.Persistence.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "LikedSearchPosts",
+                columns: table => new
+                {
+                    SearchPostId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedSearchPosts", x => new { x.SearchPostId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_LikedSearchPosts_SearchPosts_SearchPostId",
+                        column: x => x.SearchPostId,
+                        principalTable: "SearchPosts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "LikedSalePosts",
+                columns: table => new
+                {
+                    SalePostId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedSalePosts", x => new { x.SalePostId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_LikedSalePosts_MerchPosts_SalePostId",
+                        column: x => x.SalePostId,
+                        principalTable: "MerchPosts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "OfferPosts",
                 columns: table => new
                 {
@@ -196,7 +234,7 @@ namespace TCG.PostService.Persistence.Migrations
                     BuyerId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OfferStatePostId = table.Column<string>(type: "char(1)", nullable: false),
-                    MerchPostId = table.Column<int>(type: "int", nullable: false),
+                    MerchPostId = table.Column<Guid>(type: "char(36)", nullable: false),
                     SearchPostId = table.Column<Guid>(type: "char(36)", nullable: true)
                 },
                 constraints: table =>
@@ -229,7 +267,7 @@ namespace TCG.PostService.Persistence.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "longtext", nullable: false),
-                    SalePostId = table.Column<int>(type: "int", nullable: false)
+                    SalePostId = table.Column<Guid>(type: "char(36)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -247,8 +285,8 @@ namespace TCG.PostService.Persistence.Migrations
                 name: "SalePostLots",
                 columns: table => new
                 {
-                    LotPostId = table.Column<int>(type: "int", nullable: false),
-                    SalePostId = table.Column<int>(type: "int", nullable: false)
+                    LotPostId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    SalePostId = table.Column<Guid>(type: "char(36)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -334,6 +372,12 @@ namespace TCG.PostService.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AvailableRewards");
+
+            migrationBuilder.DropTable(
+                name: "LikedSalePosts");
+
+            migrationBuilder.DropTable(
+                name: "LikedSearchPosts");
 
             migrationBuilder.DropTable(
                 name: "OfferPosts");

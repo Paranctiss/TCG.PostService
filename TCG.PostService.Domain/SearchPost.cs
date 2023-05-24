@@ -19,5 +19,7 @@ public class SearchPost
     public char StatePostId { get; set; }
     public virtual StatePost StatePost { get; set; }
 
+    public ICollection<LikedSearchPosts> LikedSearchPosts;
+
     public int UserId { get; set; }
 }
