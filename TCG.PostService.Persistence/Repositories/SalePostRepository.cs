@@ -77,4 +77,9 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
             .Take(pageSize)
             .ToListAsync();
     }
+
+    public async Task<SalePost> GetSingleSalePostAsync(CancellationToken cancellationToken, Guid id)
+    {
+        return await _dbContext.SalePosts.Include(sp => sp.SalePicturePosts).FirstOrDefaultAsync(x => x.Id == id);
+    }
 }
