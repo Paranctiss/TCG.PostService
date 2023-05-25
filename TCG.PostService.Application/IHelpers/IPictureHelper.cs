@@ -9,9 +9,7 @@ namespace TCG.PostService.Application.IHelpers
 {
     public interface IPictureHelper
     {
-        void PrepareToDownload();
-        void SetUpExtensionDirectory(string userId);
-        void SavePicture(string name, string base64);
+        Task SavePictureToAzure(string nomFichier, string base64String);
         string GetDossierPhoto();
     }
 }
