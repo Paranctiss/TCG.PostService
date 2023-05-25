@@ -45,5 +45,36 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
             .Take(pageSize)
             .ToListAsync();
     }
-    
+
+    public async Task<IEnumerable<SalePost>> GetLastUserSalePostAsync<TOrderKey>(
+    int pageSize,
+    int userId,
+    CancellationToken cancellationToken,
+    Expression<Func<SalePost, TOrderKey>> orderBy = null,
+    bool descending = true,
+    Expression<Func<SalePost, bool>> filter = null)
+    {
+        var query = _dbContext.Set<SalePost>().Include(sp => sp.SalePicturePosts).AsQueryable();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (orderBy != null)
+        {
+            if (descending)
+            {
+                query = query.OrderByDescending(orderBy);
+            }
+            else
+            {
+                query = query.OrderBy(orderBy);
+            }
+        }
+        return await query
+            .Where(u => u.UserId == userId)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }
