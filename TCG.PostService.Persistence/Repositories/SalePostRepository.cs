@@ -80,6 +80,6 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
 
     public async Task<SalePost> GetSingleSalePostAsync(CancellationToken cancellationToken, Guid id)
     {
-        return await _dbContext.SalePosts.Include(sp => sp.SalePicturePosts).FirstOrDefaultAsync(x => x.Id == id);
+        return await _dbContext.SalePosts.Include(sp => sp.SalePicturePosts).Include(s => s.Grading).FirstOrDefaultAsync(x => x.Id == id);
     }
 }
