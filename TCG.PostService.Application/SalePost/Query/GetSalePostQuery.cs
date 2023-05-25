@@ -27,7 +27,7 @@ public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePos
     {
         try
         {
-            var salePost = await _repository.GetByGUIDAsync(request.id, cancellationToken);
+            var salePost = await _repository.GetSingleSalePostAsync(cancellationToken, request.id);
 
             if (salePost == null)
             {

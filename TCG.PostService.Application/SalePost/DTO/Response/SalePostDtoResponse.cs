@@ -12,5 +12,7 @@ public class SalePostDtoResponse
     public int UserId { get; set; }
     public string Name { get; set; }
     public string Image { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public virtual GradingDtoResponse Grading { get; set; }
     public ICollection<string> SalePicturePosts { get; set; }
 }
