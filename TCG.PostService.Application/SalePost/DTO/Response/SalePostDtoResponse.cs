@@ -15,4 +15,5 @@ public class SalePostDtoResponse
     public DateTime CreatedAt { get; set; }
     public virtual GradingDtoResponse Grading { get; set; }
     public ICollection<string> SalePicturePosts { get; set; }
+    public bool Liked { get; set; }
 }

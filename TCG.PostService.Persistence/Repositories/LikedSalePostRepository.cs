@@ -21,7 +21,7 @@ namespace TCG.PostService.Persistence.Repositories
 
         public async Task<IEnumerable<LikedSalePosts>> GetLikedSalePostsByUserIdAsync(CancellationToken cancellationToken, int userId)
         {
-            return await _dbContext.LikedSalePosts.Include(s => s.SalePost).Include(g => g.SalePost.Grading).Where(x => x.UserId == userId).ToListAsync();
+            return await _dbContext.LikedSalePosts.Include(s => s.SalePost).Include(g => g.SalePost.Grading).Include(p => p.SalePost.SalePicturePosts).Where(x => x.UserId == userId).ToListAsync();
         }
 
         public async Task<LikedSalePostDtoRequest> RemoveLikedSalePosts(LikedSalePostDtoRequest likedSalePost, CancellationToken cancellationToken)

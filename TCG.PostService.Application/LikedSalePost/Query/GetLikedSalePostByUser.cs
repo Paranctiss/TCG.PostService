@@ -51,14 +51,7 @@ namespace TCG.PostService.Application.LikedSalePost.Query
 
                 foreach (LikedSalePostDtoResponse likedSalePostDtoResponse in likedSalePostsDto)
                 {
-                    if (_likedSalePostRepository.IsSalePostLiked(cancellationToken, 1, likedSalePostDtoResponse.SalePost.Id))
-                    {
-                        likedSalePostDtoResponse.SalePost.Liked = true;
-                    }
-                    else
-                    {
-                        likedSalePostDtoResponse.SalePost.Liked = false;
-                    }
+                    likedSalePostDtoResponse.SalePost.Liked = true;
                 }
 
                 return likedSalePostsDto;

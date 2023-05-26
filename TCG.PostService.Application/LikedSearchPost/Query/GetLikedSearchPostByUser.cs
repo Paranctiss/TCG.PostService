@@ -51,14 +51,7 @@ namespace TCG.PostService.Application.LikedSearchPost.Query
 
                 foreach (LikedSearchPostDtoResponse likedSearchPostDtoResponse in likedSearchPostsDto)
                 {
-                    if (_likedSearchPostRepository.IsSearchPostLiked(cancellationToken, 1, likedSearchPostDtoResponse.SearchPost.Id))
-                    {
-                        likedSearchPostDtoResponse.SearchPost.Liked = true;
-                    }
-                    else
-                    {
-                        likedSearchPostDtoResponse.SearchPost.Liked = false;
-                    }
+                    likedSearchPostDtoResponse.SearchPost.Liked = true;
                 }
 
                 return likedSearchPostsDto;

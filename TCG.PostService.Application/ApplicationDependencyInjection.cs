@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TCG.Common.MassTransit.Messages;
 using TCG.Common.Settings;
 using TCG.PostService.Application.SalePost.DTO.Response;
+using TCG.PostService.Application.LikedSalePost.DTO.Response;
 using TCG.PostService.Application.SearchPost.DTO.Response;
 
 namespace TCG.PostService.Application;
@@ -47,7 +48,10 @@ public static class DependencyInjection
     {
         var config = new TypeAdapterConfig();
 
-        config.NewConfig<Domain.SalePost, SalePostDtoResponse>()
+        config.NewConfig<Domain.SalePost, SalePost.DTO.Response.SalePostDtoResponse>()
+            .Map(dest => dest.SalePicturePosts, src => src.SalePicturePosts.Select(p => p.Name));
+
+        config.NewConfig<Domain.SalePost, LikedSalePost.DTO.Response.SalePostDtoResponse>()
             .Map(dest => dest.SalePicturePosts, src => src.SalePicturePosts.Select(p => p.Name));
 
         services.AddSingleton(config);

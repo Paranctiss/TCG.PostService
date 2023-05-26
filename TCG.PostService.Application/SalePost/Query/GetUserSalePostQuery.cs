@@ -14,18 +14,21 @@ public class GetUserSalePostQueryHandler : IRequestHandler<GetUserSalePostQuery,
     private readonly ILogger<GetSalePostPublicQueryHandler> _logger;
     private readonly ISalePostRepository _repository;
     private readonly IPictureRepository _pictureRepository;
+    private readonly ILikedSalePostRepository _likedSalePostRepository;
     private readonly IMapper _mapper;
 
     public GetUserSalePostQueryHandler(
         ILogger<GetSalePostPublicQueryHandler> logger,
         ISalePostRepository repository,
         IMapper mapper,
-        IPictureRepository pictureRepository)
+        IPictureRepository pictureRepository,
+        ILikedSalePostRepository likedSalePostRepository)
     {
         _logger = logger;
         _repository = repository;
         _mapper = mapper;
         _pictureRepository = pictureRepository;
+        _likedSalePostRepository = likedSalePostRepository;
     }
     public async Task<IEnumerable<SalePostDtoResponse>> Handle(GetUserSalePostQuery request, CancellationToken cancellationToken)
     {
@@ -45,7 +48,20 @@ public class GetUserSalePostQueryHandler : IRequestHandler<GetUserSalePostQuery,
                 return null;
             }
 
-            var salePostDto = _mapper.Map<IEnumerable<SalePostDtoResponse>>(salePost);
+            var salePostDto = _mapper.Map<List<SalePostDtoResponse>>(salePost);
+
+            foreach (SalePostDtoResponse salePostDtoResponse in salePostDto)
+            {
+                if (_likedSalePostRepository.IsSalePostLiked(cancellationToken, 1, salePostDtoResponse.Id))
+                {
+                    salePostDtoResponse.Liked = true;
+                }
+                else
+                {
+                    salePostDtoResponse.Liked = false;
+                }
+            }
+
             return salePostDto;
         }
         catch (Exception ex)
