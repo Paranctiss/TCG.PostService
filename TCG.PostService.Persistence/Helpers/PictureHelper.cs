@@ -1,54 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using TCG.PostService.Application.IHelpers;
 
 namespace TCG.PostService.Persistence.Helpers
 {
     public class PictureHelper : IPictureHelper
     {
-        public static string DossierRacine { get; } = "/Users/val/Documents/Dev/TCG/SalePostPicture";
-        public static string DossierPhoto { get; } = DossierRacine + "/PHOTO";
-
-        public void PrepareToDownload()
+        private string cheminPhoto = "https://tcgaccount.blob.core.windows.net/tcg-container/";
+        private string blobStorageContainerName = "tcg-container";
+        private string blobStorageConnectionString =
+            "DefaultEndpointsProtocol=https;AccountName=tcgaccount;AccountKey=zW1swQgpCjxVotb8RbDsjWUAI/z0VMF0xptY51iBROp8fKri2DwKqyPXZ9xK8pfaw2ENT4qnponz+AStCikRZg==;EndpointSuffix=core.windows.net";
+        public async Task SavePictureToAzure(string nomFichier, string base64String)
         {
-            // Créer dossier racine s'il n'existe pas
-            if (!Directory.Exists(DossierRacine))
-            {
-                Directory.CreateDirectory(DossierRacine);
-            }
-
-            // Créer dossier photo s'il n'existe pas
-            if (!Directory.Exists(DossierPhoto))
-            {
-                Directory.CreateDirectory(DossierPhoto);
-            }
-
-        }
-
-        // Créer un dossier par user
-        public void SetUpExtensionDirectory(string userId)
-        {
-            if (!Directory.Exists(DossierPhoto + "/" + userId))
-            {
-                Directory.CreateDirectory(DossierPhoto + "/" + userId);
-            }
-        }
-
-        // Enregistrement photo
-        public void SavePicture(string nomFichier, string base64String)
-        {
-            PrepareToDownload();
             byte[] imageBytes = Convert.FromBase64String(base64String);
-            string cheminComplet = DossierPhoto + "/" + nomFichier + ".webp";
-            File.WriteAllBytes(cheminComplet, imageBytes);
-        }
+            var container = new BlobContainerClient(blobStorageConnectionString, blobStorageContainerName);
 
+            // If the blob already exists, this will overwrite it.
+            var blob = container.GetBlobClient(nomFichier + ".png");
+            using (var stream = new MemoryStream(imageBytes))
+            {
+                var blobUploadOptions = new BlobUploadOptions()
+                {
+                    HttpHeaders = new BlobHttpHeaders()
+                    {
+                        ContentType = "image/png"
+                    }
+                };
+                await blob.UploadAsync(stream, blobUploadOptions);
+            }
+        }
+        
         public string GetDossierPhoto()
         {
-            return DossierPhoto;
+            return cheminPhoto;
         }
 
     }

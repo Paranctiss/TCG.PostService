@@ -49,4 +49,16 @@ public class SalePostController : ControllerBase
         }
         return Ok(salePost);
     }
+
+    [HttpGet("user/{userId}/{pageSize}")]
+    public async Task<IActionResult> GetLastUserSalePost(int pageSize,int userId, CancellationToken cancellationToken)
+    {
+        var salePost = await _mediator.Send(new GetUserSalePostQuery(pageSize, userId), cancellationToken);
+
+        if (salePost == null)
+        {
+            return NotFound();
+        }
+        return Ok(salePost);
+    }
 }

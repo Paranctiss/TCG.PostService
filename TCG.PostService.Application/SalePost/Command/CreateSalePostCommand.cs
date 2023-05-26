@@ -53,7 +53,7 @@ public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostComman
             var salePostCreatedMessage = new PostCreated(request.SalePostDtoRequest.ItemId);
             var itemFromCatalog = await _requestClient.GetResponse<PostCreatedResponse>(salePostCreatedMessage, cancellationToken);
 
-            //Création du sale post
+            //Crï¿½ation du sale post
             Domain.SalePost salePost = new()
             {
                 GradingId = request.SalePostDtoRequest.GradingId,
@@ -76,14 +76,14 @@ public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostComman
                 //Parcours la liste des photos transmise avec le salepost
                 foreach (var pic in request.SalePostDtoRequest.Pictures)
                 {
-                    _helper.SavePicture(pic.Name, pic.Base64); //Enregistre la photo sur le serveur
+                    await _helper.SavePictureToAzure(pic.Name, pic.Base64); //Enregistre la photo sur le serveur
                     var dossier = _helper.GetDossierPhoto();
 
-                    //Création de l'objet photo
+                    //Crï¿½ation de l'objet photo
                     Domain.SalePicturePost picture = new SalePicturePost()
                     {
                         //Name = DossierPhoto + "/" + requestP.PictureDtoRequest.Name + ".png",
-                        Name = dossier + "/" + pic.Name + ".webp",
+                        Name = dossier + pic.Name + ".png",
                         SalePostId = salePost.Id
                     };
 
