@@ -1,9 +1,8 @@
-using Mapster;
 using MapsterMapper;
+using TCG.Common.Authentification;
 using TCG.Common.Middlewares.MiddlewareException;
 using TCG.Common.MySqlDb;
 using TCG.PostService.Application;
-using TCG.PostService.Application.Contracts;
 using TCG.PostService.Persistence;
 
 
@@ -34,7 +33,7 @@ builder.Services.AddApplication();
 builder.Services.AddPersistence<ServiceDbContext>(builder.Configuration);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 builder.Services.AddMassTransitWithRabbitMQ();
-
+builder.Services.ConfigureAuthentication(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

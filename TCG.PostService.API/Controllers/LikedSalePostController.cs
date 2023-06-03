@@ -1,15 +1,10 @@
-﻿using FluentValidation;
-using MapsterMapper;
+﻿using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using TCG.PostService.Application.LikedSalePost.Command;
 using TCG.PostService.Application.LikedSalePost.DTO.Request;
-using TCG.PostService.Application.LikedSalePost.DTO.Response;
 using TCG.PostService.Application.LikedSalePost.Query;
-using TCG.PostService.Application.SalePost.Command;
-using TCG.PostService.Application.SalePost.Query;
-
 namespace TCG.PostService.API.Controllers
 {
     [ApiController]
@@ -25,6 +20,7 @@ namespace TCG.PostService.API.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("User/{id}")]
         public async Task<IActionResult> GetAllLikedSalePostByUser(int id, CancellationToken cancellationToken)
         {
