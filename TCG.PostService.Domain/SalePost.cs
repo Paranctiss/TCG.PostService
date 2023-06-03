@@ -10,6 +10,8 @@ public class SalePost : MerchPost
     public int GradingId { get; set; }
     public string Name { get; set; }
     public string Image { get; set; }
+    public string IdExtension { get; set; }
+    public string LibelleExtension { get; set; }
     public Grading Grading { get; set; }
 
     public ICollection<SalePicturePost> SalePicturePosts { get; set; }

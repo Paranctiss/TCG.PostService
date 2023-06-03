@@ -64,7 +64,9 @@ public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostComman
                 Name = itemFromCatalog.Message.Name,
                 Price = request.SalePostDtoRequest.Price,
                 StatePostId = request.SalePostDtoRequest.StatePostId,
-                UserId = request.SalePostDtoRequest.UserId
+                UserId = request.SalePostDtoRequest.UserId,
+                IdExtension = itemFromCatalog.Message.IdExtension,
+                LibelleExtension = itemFromCatalog.Message.LibelleExtension
             };
 
             await _repositorySalePost.ExecuteInTransactionAsync(async () =>

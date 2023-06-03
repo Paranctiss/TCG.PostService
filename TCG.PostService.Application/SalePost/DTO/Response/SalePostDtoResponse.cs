@@ -16,4 +16,6 @@ public class SalePostDtoResponse
     public virtual GradingDtoResponse Grading { get; set; }
     public ICollection<string> SalePicturePosts { get; set; }
     public bool Liked { get; set; }
+    public string IdExtension { get; set; }
+    public string LibelleExtension { get; set; }
 }
