@@ -16,6 +16,7 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
     }
     
     public async Task<IEnumerable<SalePost>> GetAllSalePostPublicAsync<TOrderKey>(
+        string idReference,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken,
         Expression<Func<SalePost, TOrderKey>> orderBy = null, 
@@ -27,6 +28,10 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
         if (filter != null)
         {
             query = query.Where(filter);
+        }
+        if(idReference!= "null")
+        {
+            query = query.Where(r => r.ItemId == idReference);
         }
         
         if (orderBy != null)
