@@ -44,9 +44,11 @@ public class SearchPostController : ControllerBase
     }
 
     [HttpGet("public")]
-    public async Task<IActionResult> GetSearchPostPublic(string idReference, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSearchPostPublic(string idReference, string idExtensions, string idGradings, CancellationToken cancellationToken)
     {
-        var searchPost = await _mediator.Send(new GetSearchPostPublicQuery(idReference), cancellationToken);
+        string[] idExtensionsArray = idExtensions.Split(",");
+        string[] idGradingsArray = idGradings.Split(",");
+        var searchPost = await _mediator.Send(new GetSearchPostPublicQuery(idReference, idExtensionsArray, idGradingsArray), cancellationToken);
 
         if (searchPost == null)
         {

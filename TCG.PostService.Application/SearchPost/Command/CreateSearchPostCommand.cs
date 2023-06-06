@@ -57,7 +57,9 @@ public class CreateSearchPostCommandHandler : IRequestHandler<CreateSearchPostCo
                 UserId = request.SearchPostDtoRequest.UserId,
                 Image = itemFromCatalog.Message.Image,
                 GradingId = request.SearchPostDtoRequest.GradingId,
-                Name = itemFromCatalog.Message.Name
+                Name = itemFromCatalog.Message.Name,
+                IdExtension = itemFromCatalog.Message.IdExtension,
+                LibelleExtension = itemFromCatalog.Message.LibelleExtension
             };
 
             await _repository.AddAsync(searchPost, cancellationToken);

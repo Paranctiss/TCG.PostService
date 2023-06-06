@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver.Linq;
@@ -14,14 +15,16 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
     {
         _dbContext = dbContext;
     }
-    
+
     public async Task<IEnumerable<SalePost>> GetAllSalePostPublicAsync<TOrderKey>(
         string idReference,
+        string[] idExtensions,
+        string[] idGradings,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken,
-        Expression<Func<SalePost, TOrderKey>> orderBy = null, 
-        bool descending = true, 
-        Expression<Func<SalePost,bool>> filter = null)
+        Expression<Func<SalePost, TOrderKey>> orderBy = null,
+        bool descending = true,
+        Expression<Func<SalePost, bool>> filter = null)
     {
         var query = _dbContext.Set<SalePost>().Include(sp => sp.SalePicturePosts).AsQueryable();
 
@@ -29,11 +32,21 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
         {
             query = query.Where(filter);
         }
-        if(idReference!= "null")
+        if (idReference != "null")
         {
             query = query.Where(r => r.ItemId == idReference);
         }
-        
+
+        if (idExtensions[0] != "undefined")
+        {
+            query = query.Where(a => idExtensions.Contains(a.IdExtension));
+        }
+
+        if (idGradings[0] != "undefined")
+        {
+            query = query.Where(g => idGradings.Contains(g.GradingId.ToString()));
+        }
+
         if (orderBy != null)
         {
             if (descending)

@@ -7,6 +7,8 @@ public interface ISalePostRepository : IRepository<Domain.SalePost>
 {
     Task<IEnumerable<Domain.SalePost>> GetAllSalePostPublicAsync<TOrderKey>(
         string idReference,
+        string[] idExtensions,
+        string[] idGradings,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken,
         Expression<Func<Domain.SalePost, TOrderKey>> orderBy = null,
