@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using TCG.Common.Contracts;
 using TCG.Common.MySqlDb;
+using TCG.Common.Settings;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Domain;
 
@@ -8,13 +10,15 @@ namespace TCG.PostService.Persistence;
 
 public class ServiceDbContext : DbContext
 {
+    private readonly IConfiguration _configuration;
 
     public ServiceDbContext()
     {
         
     }
-    public ServiceDbContext(DbContextOptions<ServiceDbContext> options) : base(options)
+    public ServiceDbContext(DbContextOptions<ServiceDbContext> options, IConfiguration configuration) : base(options)
     {
+        _configuration = configuration;
         Database.EnsureCreated();
     }
 
@@ -45,14 +49,6 @@ public class ServiceDbContext : DbContext
         return base.Database.MigrateAsync();
     }
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseMySQL(
-                "Host=localhost;Port=3306;Database=mydatabase;Username=myuser;Password=mypassword");
-        }
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
