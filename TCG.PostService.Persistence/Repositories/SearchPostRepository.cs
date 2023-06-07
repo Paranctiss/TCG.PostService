@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Mysqlx.Crud;
+using System.Drawing.Printing;
 using TCG.Common.MySqlDb;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Domain;
@@ -13,15 +15,29 @@ public class SearchPostRepository : Repository<SearchPost>, ISearchPostRepositor
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<SearchPost>> GetAllSearchPostPublicAsync(string idReference, string[] idExtensions, string[] idGradings, CancellationToken cancellationToken)
+    public async Task<IEnumerable<SearchPost>> GetAllSearchPostPublicAsync(
+        string idReference, 
+        string[] idExtensions, 
+        string[] idGradings,
+        int pageNumber, int pageSize,
+        CancellationToken cancellationToken)
     {
-        return await _dbContext.SearchPosts
-               .Include(s => s.Grading)
-               .Where(x => x.IsPublic == true 
-               && (idReference == "null" || x.ItemId == idReference) 
-               && (idExtensions[0] == "undefined" || idExtensions.Contains(x.IdExtension))
-               && (idGradings[0] == "undefined" || idGradings.Contains(x.GradingId.ToString())))
-               .ToListAsync();
+
+        var query = _dbContext.Set<SearchPost>()
+        .Include(s => s.Grading)
+        .Where(x => x.IsPublic &&
+            (idReference == "null" || x.ItemId == idReference) &&
+            (idExtensions[0] == "undefined" || idExtensions.Contains(x.IdExtension)) &&
+            (idGradings[0] == "undefined" || idGradings.Contains(x.GradingId.ToString())))
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+        return await query;
+
+      
+
+
     }
 
     public async Task<SearchPost> GetSingleSearchPostAsync(CancellationToken cancellationToken, Guid id)

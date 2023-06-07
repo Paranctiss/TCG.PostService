@@ -7,7 +7,7 @@ using TCG.PostService.Application.SearchPost.DTO.Response;
 
 namespace TCG.PostService.Application.SearchPost.Query;
 
-public record GetSearchPostPublicQuery(string idReference, string[] idExtensions, string[] idGradings) : IRequest<IEnumerable<SearchPostDtoResponse>>;
+public record GetSearchPostPublicQuery(string idReference, string[] idExtensions, string[] idGradings, int pageNumber, int pageSize) : IRequest<IEnumerable<SearchPostDtoResponse>>;
 
 public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPublicQuery, IEnumerable<SearchPostDtoResponse>>
 {
@@ -27,7 +27,13 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
     {
         try
         {
-            var searchPosts = await _repository.GetAllSearchPostPublicAsync(request.idReference, request.idExtensions, request.idGradings, cancellationToken);
+            var searchPosts = await _repository.GetAllSearchPostPublicAsync(
+                request.idReference, 
+                request.idExtensions, 
+                request.idGradings,
+                request.pageNumber,
+                request.pageSize,
+                cancellationToken);
 
             if (searchPosts == null)
             {
