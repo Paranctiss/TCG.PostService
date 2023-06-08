@@ -45,7 +45,10 @@ public static class DependencyInjection
                     // Exponential back-off (second argument is the max retry count)
                     retryConfig.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(3));
                 });
-                
+
+                // Message Redelivery/Dead-lettering
+                configurator.UseScheduledRedelivery(r => r.Incremental(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5)));
+
                 //Defnir comment les queues sont crées dans rabbit
                 configurator.ConfigureEndpoints(context);
                 configurator.ReceiveEndpoint("invoiceservice", e =>
@@ -62,6 +65,8 @@ public static class DependencyInjection
                 configure.AddConsumer<BuyerTransactionsConsumer>();
 
             });
+            configure.AddRequestClient<AddMessage>();
+            configure.AddRequestClient<UpdateOfferInMessage>();
             configure.AddRequestClient<PostCreated>();
             configure.AddRequestClient<UserById>();
             configure.AddRequestClient<UserByToken>();
