@@ -4,10 +4,11 @@ using TCG.Common.Middlewares.MiddlewareException;
 using TCG.Common.MySqlDb;
 using TCG.PostService.Application;
 using TCG.PostService.Persistence;
-using TCG.PostService.API.SwaggerConfig;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using TCG.Common.Versioning.SwaggerConfig;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -53,7 +54,8 @@ builder.Services
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>>(provider =>
+    new ConfigureSwaggerOptions(provider.GetRequiredService<IApiVersionDescriptionProvider>(), "PostService"));
 builder.Services.AddSwaggerGen(options =>
 {
     // Add a custom operation filter which sets default values
