@@ -8,6 +8,7 @@ public interface ISearchPostRepository : IRepository<Domain.SearchPost>
         string idReference, 
         string[] idExtensions, 
         string[] idGradings,
+        string idUser,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken);
 

@@ -37,11 +37,11 @@ public class SalePostController : ControllerBase
     }
 
     [HttpGet("public")]
-    public async Task<IActionResult> GetSalePostPublic(string idReference, string idExtensions, string idGradings, CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetSalePostPublic(string idReference, string idExtensions, string idGradings, string idUser, CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         string[] idExtensionsArray = idExtensions.Split(",");
         string[] idGradingsArray = idGradings.Split(",");
-        var salePost = await _mediator.Send(new GetSalePostPublicQuery(idReference, idExtensionsArray, idGradingsArray, pageNumber, pageSize), cancellationToken);
+        var salePost = await _mediator.Send(new GetSalePostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize), cancellationToken);
 
         if (salePost == null)
         {

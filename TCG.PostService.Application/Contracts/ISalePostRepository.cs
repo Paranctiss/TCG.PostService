@@ -9,6 +9,7 @@ public interface ISalePostRepository : IRepository<Domain.SalePost>
         string idReference,
         string[] idExtensions,
         string[] idGradings,
+        string idUser,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken,
         Expression<Func<Domain.SalePost, TOrderKey>> orderBy = null,

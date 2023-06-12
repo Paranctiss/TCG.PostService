@@ -19,6 +19,7 @@ public class SearchPostRepository : Repository<SearchPost>, ISearchPostRepositor
         string idReference, 
         string[] idExtensions, 
         string[] idGradings,
+        string idUser,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken)
     {
@@ -27,6 +28,7 @@ public class SearchPostRepository : Repository<SearchPost>, ISearchPostRepositor
         .Include(s => s.Grading)
         .Where(x => x.IsPublic &&
             (idReference == "null" || x.ItemId == idReference) &&
+            (idUser == "undefined" || x.UserId == int.Parse(idUser)) &&
             (idExtensions[0] == "undefined" || idExtensions.Contains(x.IdExtension)) &&
             (idGradings[0] == "undefined" || idGradings.Contains(x.GradingId.ToString())))
         .Skip((pageNumber - 1) * pageSize)

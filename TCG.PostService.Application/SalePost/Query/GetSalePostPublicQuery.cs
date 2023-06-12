@@ -7,7 +7,7 @@ using TCG.PostService.Application.SalePost.DTO.Response;
 
 namespace TCG.PostService.Application.SalePost.Query;
 
-public record GetSalePostPublicQuery(string idReference, string[] idExtensions, string[] idGradings, int pageNumber, int pageSize) : IRequest<IEnumerable<SalePostDtoResponse>>;
+public record GetSalePostPublicQuery(string idReference, string[] idExtensions, string[] idGradings, string idUser, int pageNumber, int pageSize) : IRequest<IEnumerable<SalePostDtoResponse>>;
 
 public class GetSalePostPublicQueryHandler : IRequestHandler<GetSalePostPublicQuery, IEnumerable<SalePostDtoResponse>>
 {
@@ -38,6 +38,7 @@ public class GetSalePostPublicQueryHandler : IRequestHandler<GetSalePostPublicQu
                 request.idReference,
                 request.idExtensions,
                 request.idGradings,
+                request.idUser,
                 request.pageNumber,
                 request.pageSize,
                 cancellationToken,

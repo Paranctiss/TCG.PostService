@@ -20,6 +20,7 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
         string idReference,
         string[] idExtensions,
         string[] idGradings,
+        string idUser,
         int pageNumber, int pageSize,
         CancellationToken cancellationToken,
         Expression<Func<SalePost, TOrderKey>> orderBy = null,
@@ -45,6 +46,11 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
         if (idGradings[0] != "undefined")
         {
             query = query.Where(g => idGradings.Contains(g.GradingId.ToString()));
+        }
+
+        if(idUser != "undefined")
+        {
+            query = query.Where(u => u.UserId == int.Parse(idUser));
         }
 
         if (orderBy != null)
