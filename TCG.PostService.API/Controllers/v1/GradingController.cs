@@ -1,14 +1,13 @@
-﻿using MediatR;
+﻿using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TCG.PostService.Application.Gradings.Query;
-using TCG.PostService.Application.SalePost.Command;
-using TCG.PostService.Application.SalePost.DTO.Request;
-using TCG.PostService.Application.SalePost.Query;
 
-namespace TCG.PostService.API.Controllers;
+namespace TCG.PostService.API.Controllers.v1;
 
 [ApiController]
 [Route("[controller]")]
+[ApiVersion("1.0")]
 public class GradingController : ControllerBase
 {
     private readonly IMediator _mediator;

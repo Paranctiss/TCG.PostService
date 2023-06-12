@@ -1,16 +1,16 @@
-using FluentValidation;
+using Asp.Versioning;
 using MapsterMapper;
 using MediatR;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TCG.PostService.Application.SearchPost.Command;
 using TCG.PostService.Application.SearchPost.DTO;
 using TCG.PostService.Application.SearchPost.Query;
 
-namespace TCG.PostService.API.Controllers;
+namespace TCG.PostService.API.Controllers.v1;
 
 [ApiController]
 [Route("[controller]")]
+[ApiVersion("1.0")]
 public class SearchPostController : ControllerBase
 {
     private readonly IMediator _mediator;

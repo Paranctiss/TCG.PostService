@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Authorization;
 using TCG.PostService.Application.LikedSalePost.Command;
 using TCG.PostService.Application.LikedSalePost.DTO.Request;
 using TCG.PostService.Application.LikedSalePost.Query;
-namespace TCG.PostService.API.Controllers
+using Asp.Versioning;
+
+namespace TCG.PostService.API.Controllers.v1
 {
     [ApiController]
     [Route("[controller]")]
+    [ApiVersion("1.0")]
     public class LikedSalePostController : ControllerBase
     {
         private readonly IMediator _mediator;
