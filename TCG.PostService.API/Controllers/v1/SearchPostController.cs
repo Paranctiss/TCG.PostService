@@ -69,10 +69,10 @@ public class SearchPostController : ControllerBase
         return Ok(searchPost);
     }
 
-    [HttpPut("switchPublic")]
-    public async Task<IActionResult> UpdateIsPublic(bool isPublic,Guid idPost, CancellationToken cancellationToken)
+    [HttpPut("public/{id}")]
+    public async Task<IActionResult> UpdateIsPublic(Guid id, CancellationToken cancellationToken)
     {
-        var searchPost = await _mediator.Send(new UpdateSearchPostCommand(idPost,isPublic), cancellationToken);
+        var searchPost = await _mediator.Send(new UpdateSearchPostCommand(id), cancellationToken);
 
         if (searchPost == null)
         {
