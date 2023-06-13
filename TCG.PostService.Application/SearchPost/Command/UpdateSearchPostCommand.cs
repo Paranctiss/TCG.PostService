@@ -4,6 +4,7 @@ using MassTransit;
 using MassTransit.Clients;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,13 @@ using TCG.PostService.Application.LikedSearchPost.DTO.Response;
 
 namespace TCG.PostService.Application.SearchPost.Command;
 
-public record UpdateSearchPostCommand(Guid IdPost, bool IsPublic) : IRequest<SearchPostDtoResponse>;
+public record UpdateSearchPostCommand(Guid IdPost) : IRequest<SearchPostDtoResponse>;
 
 public class UpdateSearchPostValidator : AbstractValidator<UpdateSearchPostCommand>
 {
    public UpdateSearchPostValidator()
     {
         _ = RuleFor(x => x.IdPost).NotNull();
-        _ = RuleFor(x => x.IsPublic).NotNull();
     }
 }
 
@@ -45,9 +45,10 @@ public class UpdateSearchPostHandler : IRequestHandler<UpdateSearchPostCommand, 
         {
             _logger.LogInformation("Recherche du search post concerné");
             Domain.SearchPost? searchPost = await _repository.GetByGUIDAsync(request.IdPost, cancellationToken);
+
             
             _logger.LogInformation("Update du searchPost");
-            searchPost.IsPublic = request.IsPublic;
+            searchPost.IsPublic = !searchPost.IsPublic;
             await _repository.UpdateAsync(searchPost, cancellationToken);
 
             var mapped = _mapper.Map<SearchPostDtoResponse>(searchPost);
