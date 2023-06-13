@@ -26,8 +26,4 @@
       <PackageReference Include="TCG.Common" Version="1.3.21" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Migrations\" />
-    </ItemGroup>
-
 </Project>

@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace TCG.PostService.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class salePostGUID : Migration
+    public partial class InitialCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -103,6 +103,8 @@ namespace TCG.PostService.Persistence.Migrations
                     IsPublic = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Image = table.Column<string>(type: "longtext", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
+                    IdExtension = table.Column<string>(type: "longtext", nullable: false),
+                    LibelleExtension = table.Column<string>(type: "longtext", nullable: false),
                     GradingId = table.Column<int>(type: "int", nullable: false),
                     StatePostId = table.Column<string>(type: "char(1)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
@@ -161,7 +163,9 @@ namespace TCG.PostService.Persistence.Migrations
                     ItemId = table.Column<string>(type: "longtext", nullable: true),
                     GradingId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "longtext", nullable: true),
-                    Image = table.Column<string>(type: "longtext", nullable: true)
+                    Image = table.Column<string>(type: "longtext", nullable: true),
+                    IdExtension = table.Column<string>(type: "longtext", nullable: true),
+                    LibelleExtension = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -11,8 +11,8 @@ using TCG.PostService.Persistence;
 namespace TCG.PostService.Persistence.Migrations
 {
     [DbContext(typeof(ServiceDbContext))]
-    [Migration("20230605215017_searchPostExtension")]
-    partial class searchPostExtension
+    [Migration("20230613130421_InitialCreation")]
+    partial class InitialCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
