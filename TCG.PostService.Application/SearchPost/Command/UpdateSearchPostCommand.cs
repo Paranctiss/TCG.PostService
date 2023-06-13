@@ -45,6 +45,7 @@ public class UpdateSearchPostHandler : IRequestHandler<UpdateSearchPostCommand, 
         {
             _logger.LogInformation("Recherche du search post concerné");
             Domain.SearchPost? searchPost = await _repository.GetByGUIDAsync(request.IdPost, cancellationToken);
+
             
             _logger.LogInformation("Update du searchPost");
             searchPost.IsPublic = !searchPost.IsPublic;
