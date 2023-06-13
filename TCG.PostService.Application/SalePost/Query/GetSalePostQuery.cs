@@ -1,6 +1,8 @@
 using MapsterMapper;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SalePost.DTO.Response;
 using TCG.PostService.Application.SearchPost.DTO.Response;
@@ -16,12 +18,14 @@ public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePos
     private readonly ILogger<GetSalePostQueryHandler> _logger;
     private readonly ISalePostRepository _repository;
     private readonly IMapper _mapper;
-    
-    public GetSalePostQueryHandler(ILogger<GetSalePostQueryHandler> logger, ISalePostRepository repository, IMapper mapper)
+    private readonly IRequestClient<UserById> _requestClient;
+
+    public GetSalePostQueryHandler(ILogger<GetSalePostQueryHandler> logger, ISalePostRepository repository, IMapper mapper, IRequestClient<UserById> requestClient)
     {
         _logger = logger;
         _repository = repository;
         _mapper = mapper;
+        _requestClient = requestClient;
     }
     public async Task<SalePostDtoResponse> Handle(GetSalePostQuery request, CancellationToken cancellationToken)
     {
@@ -35,7 +39,12 @@ public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePos
                 return null;
             }
 
+            var userById = new UserById(salePost.UserId);
+            var userFromAuth = await _requestClient.GetResponse<UserByIdResponse>(userById, cancellationToken);
+
             var salePostDtoResponse = _mapper.Map<SalePostDtoResponse>(salePost);
+
+            salePostDtoResponse.Username = userFromAuth.Message.username;
 
             return salePostDtoResponse;
         }

@@ -18,4 +18,5 @@ public class SalePostDtoResponse
     public bool Liked { get; set; }
     public string IdExtension { get; set; }
     public string LibelleExtension { get; set; }
+    public string Username { get; set; }
 }
