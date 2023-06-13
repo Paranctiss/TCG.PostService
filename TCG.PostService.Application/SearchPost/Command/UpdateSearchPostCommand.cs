@@ -23,7 +23,6 @@ public class UpdateSearchPostValidator : AbstractValidator<UpdateSearchPostComma
    public UpdateSearchPostValidator()
     {
         _ = RuleFor(x => x.IdPost).NotNull();
-        _ = RuleFor(x => x.IsPublic).NotNull();
     }
 }
 
