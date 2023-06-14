@@ -44,7 +44,7 @@ public class GetSalePostPublicQueryHandler : IRequestHandler<GetSalePostPublicQu
                 cancellationToken,
                 orderBy: x => x.CreatedAt,
                 descending: true,
-                filter: x => x.IsPublic);
+                filter: x => x.IsPublic && x.StatePostId == 'C');
 
             if (salePost == null)
             {
