@@ -70,9 +70,14 @@ public class SearchPostController : ControllerBase
     }
 
     [HttpPut("public/{id}")]
-    public async Task<IActionResult> UpdateIsPublic(Guid id, int idUser, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateIsPublic(Guid id, CancellationToken cancellationToken)
     {
-        var searchPost = await _mediator.Send(new UpdateSearchPostCommand(id, idUser), cancellationToken);
+
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        var token = authorizationContent.ToString().Substring("Bearer ".Length);
+        var searchPost = await _mediator.Send(new UpdateSearchPostCommand(id, token), cancellationToken);
+        
+
 
         if (searchPost == null)
         {

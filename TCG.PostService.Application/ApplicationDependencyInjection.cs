@@ -54,6 +54,7 @@ public static class DependencyInjection
             });
             configure.AddRequestClient<PostCreated>();
             configure.AddRequestClient<UserById>();
+            configure.AddRequestClient<UserByToken>();
         });
         //Start rabbitmq bus pour exanges
         serviceCollection.AddMassTransitHostedService();
