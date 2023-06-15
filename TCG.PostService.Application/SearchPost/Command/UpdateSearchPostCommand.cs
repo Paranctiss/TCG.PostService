@@ -11,8 +11,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TCG.Common.MassTransit.Messages;
+using TCG.Common.Middlewares.MiddlewareException;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.DTO.Response;
+using UnauthorizedAccessException = System.UnauthorizedAccessException;
 
 namespace TCG.PostService.Application.SearchPost.Command;
 
@@ -52,10 +54,13 @@ public class UpdateSearchPostHandler : IRequestHandler<UpdateSearchPostCommand, 
             {
                 _logger.LogWarning("Search post with id {SearchPostId} not found", request.IdPost);
                 return null;
-            } else
+            }
+            else
             {
                 var userByToken = new UserByToken(request.Token, cancellationToken);
-                var userFromAuth = await _requestClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+                var userFromAuth =
+                    await _requestClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+                
                 // if (userFromAuth.Message.idUser == searchPost.UserId)
                 //{
                 //    searchPost.IsPublic = !searchPost.IsPublic;
@@ -71,8 +76,14 @@ public class UpdateSearchPostHandler : IRequestHandler<UpdateSearchPostCommand, 
         }
         catch (Exception e)
         {
-            _logger.LogError("Error during update of search post with error {error}", e.Message);
-            throw;
+            if (e.Message.Contains("401"))
+            {
+                throw new UnAuthorizedException("User is unauthorized");
+            }else
+            {
+                _logger.LogError("Error during update of search post with error {error}", e.Message);
+                throw new UnAuthorizedException(e.Message);
+            }
         }
     }
 
