@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TCG.PostService.Application.SalePost.Command;
 using TCG.PostService.Application.SalePost.DTO.Request;
 using TCG.PostService.Application.SalePost.Query;
+using TCG.PostService.Application.SearchPost.Command;
 
 namespace TCG.PostService.API.Controllers.v1;
 
@@ -60,5 +61,22 @@ public class SalePostController : ControllerBase
             return NotFound();
         }
         return Ok(salePost);
+    }
+
+    [HttpPut("public/{id}")]
+    public async Task<IActionResult> UpdateIsPublic(Guid id, CancellationToken cancellationToken)
+    {
+
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        var token = authorizationContent.ToString().Substring("Bearer ".Length);
+        var salePost = await _mediator.Send(new UpdateSalePostCommand(id, token), cancellationToken);
+
+
+
+        if (salePost == null)
+        {
+            return BadRequest();
+        }
+        return StatusCode(204);
     }
 }
