@@ -58,14 +58,13 @@ public class UpdateSearchPostHandler : IRequestHandler<UpdateSearchPostCommand, 
             else
             {
                 var userByToken = new UserByToken(request.Token, cancellationToken);
-                var userFromAuth =
-                    await _requestClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
-                
-                // if (userFromAuth.Message.idUser == searchPost.UserId)
-                //{
-                //    searchPost.IsPublic = !searchPost.IsPublic;
-                //    await _repository.UpdateAsync(searchPost, cancellationToken);
-                //}
+                var userFromAuth = await _requestClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+
+                if (userFromAuth.Message.idUser == searchPost.UserId)
+                {
+                    searchPost.IsPublic = !searchPost.IsPublic;
+                    await _repository.UpdateAsync(searchPost, cancellationToken);
+                }
             }
 
             var SearchPostDtoResponse = _mapper.Map<SearchPostDtoResponse>(searchPost);
