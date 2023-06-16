@@ -22,7 +22,8 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'config'
-    nugetConfigPath: 'NuGet.Config'
+    nugetConfigPath: './NuGet.Config'
+    externalFeedCredentials: 'MyAzureArtifactsFeed'
 
 - task: VSBuild@1
   inputs:
