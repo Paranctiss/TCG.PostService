@@ -44,6 +44,12 @@ steps:
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: 'Dockerfile'
+    artifactName: 'DockerfileArtifact'
+    publishLocation: 'Container'
   
 - task: PublishBuildArtifacts@1
   inputs:
