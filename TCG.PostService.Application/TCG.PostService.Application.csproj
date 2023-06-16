@@ -29,4 +29,8 @@
       <Folder Include="Gradings\Command\" />
     </ItemGroup>
 
+	<PropertyGroup>
+		<RestoreSources>$(RestoreSources);https://pkgs.dev.azure.com/ProjetCSC/_packaging/ProjetCSC/nuget/v3/index.json</RestoreSources>
+	</PropertyGroup>
+
 </Project>
