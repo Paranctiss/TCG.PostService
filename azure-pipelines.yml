@@ -23,7 +23,7 @@ steps:
     restoreSolution: '**/*.sln'
     feedsToUse: 'config'
     nugetConfigPath: './NuGet.Config'
-    externalFeedCredentials: 'MyAzureArtifactsFeed'
+    externalFeedCredentials: 'TCG.Common'
 
 - task: VSBuild@1
   inputs:
