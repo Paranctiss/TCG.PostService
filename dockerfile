@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 
 # Accept the PAT as an argument
-ARG NUGET_PAT=PAT_VALUE_HERE
+ARG NUGET_PAT=uecj2gtowgl4amgmzrbq7amkiukntckmdgkumse4smz4brjlhxqa
 
 # Set the environment variable for NuGet
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
