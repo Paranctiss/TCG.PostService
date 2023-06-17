@@ -7,22 +7,13 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-
-# Accept the PAT as an argument
-ARG NUGET_PAT=uecj2gtowgl4amgmzrbq7amkiukntckmdgkumse4smz4brjlhxqa
-
-# Set the environment variable for NuGet
-ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS \
-    "{\"endpointCredentials\": [{\"endpoint\":\"https://pkgs.dev.azure.com/ProjetCSC/_packaging/ProjetCSC/nuget/v3/index.json\", \"username\":\"any\", \"password\":\"${NUGET_PAT}\"}]}"
-
 COPY ["TCG.PostService.API/TCG.PostService.API.csproj", "TCG.PostService.API/"]
 COPY ["TCG.PostService.Application/TCG.PostService.Application.csproj", "TCG.PostService.Application/"]
 COPY ["TCG.PostService.Domain/TCG.PostService.Domain.csproj", "TCG.PostService.Domain/"]
 COPY ["TCG.PostService.Persistence/TCG.PostService.Persistence.csproj", "TCG.PostService.Persistence/"]
 COPY . .
 WORKDIR "/src/TCG.PostService.API"
-RUN dotnet restore
+#COPY ./.nuget/packages /root/.nuget/packages
 RUN dotnet build "TCG.PostService.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
