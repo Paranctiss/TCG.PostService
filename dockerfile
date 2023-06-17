@@ -7,12 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["NuGet.Config", "/root/.nuget/NuGet/"]
 COPY ["TCG.PostService.API/TCG.PostService.API.csproj", "TCG.PostService.API/"]
 COPY ["TCG.PostService.Application/TCG.PostService.Application.csproj", "TCG.PostService.Application/"]
 COPY ["TCG.PostService.Domain/TCG.PostService.Domain.csproj", "TCG.PostService.Domain/"]
 COPY ["TCG.PostService.Persistence/TCG.PostService.Persistence.csproj", "TCG.PostService.Persistence/"]
-RUN dotnet restore "TCG.PostService.API/TCG.PostService.API.csproj"
 COPY . .
 WORKDIR "/src/TCG.PostService.API"
 RUN dotnet build "TCG.PostService.API.csproj" -c Release -o /app/build
