@@ -13,6 +13,7 @@ COPY ["TCG.PostService.Domain/TCG.PostService.Domain.csproj", "TCG.PostService.D
 COPY ["TCG.PostService.Persistence/TCG.PostService.Persistence.csproj", "TCG.PostService.Persistence/"]
 COPY . .
 WORKDIR "/src/TCG.PostService.API"
+COPY ./.nuget/packages /root/.nuget/packages
 RUN dotnet build "TCG.PostService.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
