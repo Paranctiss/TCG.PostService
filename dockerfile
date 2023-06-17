@@ -14,7 +14,7 @@ ARG NUGET_PAT=uecj2gtowgl4amgmzrbq7amkiukntckmdgkumse4smz4brjlhxqa
 # Set the environment variable for NuGet
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS \
-    "{\"endpointCredentials\": [{\"endpoint\":\"https://pkgs.dev.azure.com/ProjetCSC/_packaging/ProjetCSC/nuget/v3/index.json\", \"username\":\"any\", \"password\":\"${NUGET_PAT}\"}]}"
+    "{\"endpointCredentials\": [{\"endpoint\":\"https://pkgs.dev.azure.com/ProjetCSC/_packaging/ProjetCSC/nuget/v3/index.json", \"username\":\"any\", \"password\":\"${NUGET_PAT}\"}]}"
 
 COPY ["TCG.PostService.API/TCG.PostService.API.csproj", "TCG.PostService.API/"]
 COPY ["TCG.PostService.Application/TCG.PostService.Application.csproj", "TCG.PostService.Application/"]
