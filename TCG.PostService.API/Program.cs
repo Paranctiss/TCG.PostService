@@ -69,6 +69,13 @@ builder.Services.AddScoped<IMapper, ServiceMapper>();
 builder.Services.AddMassTransitWithRabbitMQ();
 builder.Services.ConfigureAuthentication(builder.Configuration);
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80);
+    serverOptions.ListenAnyIP(443);
+    serverOptions.ListenAnyIP(7239);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
