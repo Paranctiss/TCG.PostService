@@ -36,6 +36,13 @@ public static class DependencyInjection
                 //On récupère le nom de la table Catalog
                 ////On recupère la config de seeting json pour rabbitMQ
                 var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
+
+                configurator.UseSsl(sslConfig =>
+                {
+                    sslConfig.Protocol = SslProtocols.Tls12; // ou la version du protocole SSL appropriée
+                    sslConfig.AllowPolicyErrors();
+                });
+
                 configurator.Host(rabbitMQSettings.Host);
                 
                 // Retry policy for consuming messages
