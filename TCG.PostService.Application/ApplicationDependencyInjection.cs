@@ -12,6 +12,7 @@ using TCG.PostService.Application.Consumer;
 using TCG.PostService.Application.SalePost.DTO.Response;
 using TCG.PostService.Application.LikedSalePost.DTO.Response;
 using TCG.PostService.Application.SearchPost.DTO.Response;
+using System.Net.Security;
 
 namespace TCG.PostService.Application;
 
