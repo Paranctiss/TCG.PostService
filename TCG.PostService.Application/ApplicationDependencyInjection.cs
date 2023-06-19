@@ -25,48 +25,51 @@ public static class DependencyInjection
     }
     
     public static IServiceCollection AddMassTransitWithRabbitMQ(this IServiceCollection serviceCollection)
+{
+    //Config masstransit to rabbitmq
+    serviceCollection.AddMassTransit(configure =>
     {
-        //Config masstransit to rabbitmq
-        serviceCollection.AddMassTransit(configure =>
+        configure.AddConsumer<OrderStatusChangedConsumer>();
+        configure.UsingRabbitMq((context, configurator) =>
         {
-            configure.AddConsumer<OrderStatusChangedConsumer>();
-            configure.UsingRabbitMq((context, configurator) =>
+            var config = context.GetService<IConfiguration>();
+            var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
+            
+            configurator.Host(rabbitMQSettings.Host, "/", h =>
             {
-                var config = context.GetService<IConfiguration>();
-                //On récupère le nom de la table Catalog
-                ////On recupère la config de seeting json pour rabbitMQ
-                var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
+                h.Username(rabbitMQSettings.Username);
+                h.Password(rabbitMQSettings.Password);
 
-                configurator.UseSsl(sslConfig =>
+                // Configuration SSL
+                h.UseSsl(ssl =>
                 {
-                    sslConfig.Protocol = SslProtocols.Tls12; // ou la version du protocole SSL appropriée
-                    sslConfig.AllowPolicyErrors();
-                });
-
-                configurator.Host(rabbitMQSettings.Host);
-                
-                // Retry policy for consuming messages
-                configurator.UseMessageRetry(retryConfig =>
-                {
-                    // Exponential back-off (second argument is the max retry count)
-                    retryConfig.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(3));
-                });
-                
-                //Defnir comment les queues sont crées dans rabbit
-                configurator.ConfigureEndpoints(context);
-                configurator.ReceiveEndpoint("invoiceservice", e =>
-                {
-                    e.Consumer<OrderStatusChangedConsumer>(context);
+                    ssl.ServerName = System.Net.Dns.GetHostName();
+                    ssl.AllowPolicyErrors(SslPolicyErrors.RemoteCertificateChainErrors | SslPolicyErrors.RemoteCertificateNameMismatch);
                 });
             });
-            configure.AddRequestClient<PostCreated>();
-            configure.AddRequestClient<UserById>();
-            configure.AddRequestClient<UserByToken>();
+            
+            // Retry policy for consuming messages
+            configurator.UseMessageRetry(retryConfig =>
+            {
+                // Exponential back-off (second argument is the max retry count)
+                retryConfig.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(3));
+            });
+            
+            //Defnir comment les queues sont crées dans rabbit
+            configurator.ConfigureEndpoints(context);
+            configurator.ReceiveEndpoint("invoiceservice", e =>
+            {
+                e.Consumer<OrderStatusChangedConsumer>(context);
+            });
         });
-        //Start rabbitmq bus pour exanges
-        serviceCollection.AddMassTransitHostedService();
-        return serviceCollection;
-    }
+        configure.AddRequestClient<PostCreated>();
+        configure.AddRequestClient<UserById>();
+        configure.AddRequestClient<UserByToken>();
+    });
+    //Start rabbitmq bus pour exanges
+    serviceCollection.AddMassTransitHostedService();
+    return serviceCollection;
+}
 
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
