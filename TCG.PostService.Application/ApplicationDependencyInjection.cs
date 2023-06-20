@@ -13,6 +13,8 @@ using TCG.PostService.Application.SalePost.DTO.Response;
 using TCG.PostService.Application.LikedSalePost.DTO.Response;
 using TCG.PostService.Application.SearchPost.DTO.Response;
 using System.Net.Security;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TCG.PostService.Application;
 
@@ -20,57 +22,59 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddSingleton<ICertificateValidationInitializer, CertificateValidationInitializer>(sp =>
+            new CertificateValidationInitializer(@"../TCG.PostService.Persistence/keys/rabbitmq.pem"));
         services.AddMediatR(Assembly.GetExecutingAssembly());
        
         return services;
     }
     
     public static IServiceCollection AddMassTransitWithRabbitMQ(this IServiceCollection serviceCollection)
-{
-    //Config masstransit to rabbitmq
-    serviceCollection.AddMassTransit(configure =>
     {
-        configure.AddConsumer<OrderStatusChangedConsumer>();
-        configure.UsingRabbitMq((context, configurator) =>
+        //Config masstransit to rabbitmq
+        serviceCollection.AddMassTransit(configure =>
         {
-            var config = context.GetService<IConfiguration>();
-            var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
-            
-            configurator.Host(rabbitMQSettings.Host, "/", h =>
+            configure.AddConsumer<OrderStatusChangedConsumer>();
+            configure.UsingRabbitMq((context, configurator) =>
             {
-                h.Username(rabbitMQSettings.Username);
-                h.Password(rabbitMQSettings.Password);
-
-                // Configuration SSL
-                h.UseSsl(ssl =>
+                var config = context.GetService<IConfiguration>();
+                var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
+            
+                configurator.Host(rabbitMQSettings.Host, "/", h =>
                 {
-                    ssl.ServerName = System.Net.Dns.GetHostName();
-                    ssl.AllowPolicyErrors(SslPolicyErrors.RemoteCertificateChainErrors | SslPolicyErrors.RemoteCertificateNameMismatch);
+                    h.Username(rabbitMQSettings.Username);
+                    h.Password(rabbitMQSettings.Password);
+
+                    // Configuration SSL
+                    h.UseSsl(ssl =>
+                    {
+                        ssl.ServerName = System.Net.Dns.GetHostName();
+                        ssl.AllowPolicyErrors(SslPolicyErrors.RemoteCertificateChainErrors | SslPolicyErrors.RemoteCertificateNameMismatch);
+                    });
+                });
+            
+                // Retry policy for consuming messages
+                configurator.UseMessageRetry(retryConfig =>
+                {
+                    // Exponential back-off (second argument is the max retry count)
+                    retryConfig.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(3));
+                });
+            
+                //Defnir comment les queues sont crées dans rabbit
+                configurator.ConfigureEndpoints(context);
+                configurator.ReceiveEndpoint("invoiceservice", e =>
+                {
+                    e.Consumer<OrderStatusChangedConsumer>(context);
                 });
             });
-            
-            // Retry policy for consuming messages
-            configurator.UseMessageRetry(retryConfig =>
-            {
-                // Exponential back-off (second argument is the max retry count)
-                retryConfig.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(3));
-            });
-            
-            //Defnir comment les queues sont crées dans rabbit
-            configurator.ConfigureEndpoints(context);
-            configurator.ReceiveEndpoint("invoiceservice", e =>
-            {
-                e.Consumer<OrderStatusChangedConsumer>(context);
-            });
+            configure.AddRequestClient<PostCreated>();
+            configure.AddRequestClient<UserById>();
+            configure.AddRequestClient<UserByToken>();
         });
-        configure.AddRequestClient<PostCreated>();
-        configure.AddRequestClient<UserById>();
-        configure.AddRequestClient<UserByToken>();
-    });
-    //Start rabbitmq bus pour exanges
-    serviceCollection.AddMassTransitHostedService();
-    return serviceCollection;
-}
+        //Start rabbitmq bus pour exanges
+        serviceCollection.AddMassTransitHostedService();
+        return serviceCollection;
+    }
 
     public static IServiceCollection AddMapper(this IServiceCollection services)
     {
@@ -85,5 +89,33 @@ public static class DependencyInjection
         services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();
         return services;
+    }
+
+}
+
+
+public interface ICertificateValidationInitializer
+{
+    void InitializeCertificateValidation();
+}
+
+public class CertificateValidationInitializer : ICertificateValidationInitializer
+{
+    private readonly string _certificatePath;
+
+    public CertificateValidationInitializer(string certificatePath)
+    {
+        _certificatePath = certificatePath;
+    }
+
+    public void InitializeCertificateValidation()
+    {
+        var cert = new X509Certificate2(_certificatePath);
+
+        ServicePointManager.ServerCertificateValidationCallback +=
+            (sender, certificate, chain, sslPolicyErrors) =>
+            {
+                return certificate.GetCertHashString() == cert.GetCertHashString();
+            };
     }
 }
