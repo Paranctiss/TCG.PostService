@@ -30,6 +30,7 @@ public static class DependencyInjection
         serviceCollection.AddMassTransit(configure =>
         {
             configure.AddConsumer<OrderStatusChangedConsumer>();
+            configure.AddConsumer<BuyerTransactionsConsumer>();
             configure.UsingRabbitMq((context, configurator) =>
             {
                 var config = context.GetService<IConfiguration>();
@@ -49,8 +50,17 @@ public static class DependencyInjection
                 configurator.ConfigureEndpoints(context);
                 configurator.ReceiveEndpoint("invoiceservice", e =>
                 {
+                    e.UseMessageRetry(r => r.Interval(2, 3000));
                     e.Consumer<OrderStatusChangedConsumer>(context);
                 });
+                configurator.ReceiveEndpoint("buyer-transactions", e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(2, 3000));
+                    e.Consumer<BuyerTransactionsConsumer>(context);
+                });
+
+                configure.AddConsumer<BuyerTransactionsConsumer>();
+
             });
             configure.AddRequestClient<PostCreated>();
             configure.AddRequestClient<UserById>();

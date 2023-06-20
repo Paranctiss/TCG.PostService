@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using TCG.Common.Contracts;
+using TCG.PostService.Application.Consumer.DTO;
 
 namespace TCG.PostService.Application.Contracts;
 
@@ -25,4 +26,7 @@ public interface ISalePostRepository : IRepository<Domain.SalePost>
         Expression<Func<Domain.SalePost, bool>> filter = null);
 
     Task<Domain.SalePost> GetSingleSalePostAsync(CancellationToken cancellationToken, Guid id);
+
+    Task<IEnumerable<MerchPostResponse>> GetAllBuyerSalePostName(CancellationToken cancellationToken,
+        IEnumerable<Guid> id, int buyerId);
 }

@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver.Linq;
 using TCG.Common.MySqlDb;
+using TCG.PostService.Application.Consumer.DTO;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Domain;
 
@@ -106,4 +107,15 @@ public class SalePostRepository : Repository<SalePost>, ISalePostRepository
     {
         return await _dbContext.SalePosts.Include(sp => sp.SalePicturePosts).Include(s => s.Grading).FirstOrDefaultAsync(x => x.Id == id);
     }
+    
+    public async Task<IEnumerable<MerchPostResponse>> GetAllBuyerSalePostName(CancellationToken cancellationToken, IEnumerable<Guid> id, int buyerId)
+    {
+        var buyedTransactions = await _dbContext.SalePosts
+            .Where(x => id.Contains(x.Id))
+            .Select(sp => new MerchPostResponse { MerchPostId = sp.Id, MerchPostName = sp.Name, MerchPostNamePhotos = sp.SalePicturePosts.Select(x => x.Name)})
+            .ToListAsync();
+        return buyedTransactions;
+    }
+
+
 }
