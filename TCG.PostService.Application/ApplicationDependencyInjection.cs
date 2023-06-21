@@ -22,10 +22,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddSingleton<ICertificateValidationInitializer, CertificateValidationInitializer>(sp =>
-            new CertificateValidationInitializer(@"../TCG.PostService.Persistence/keys/rabbitmq.pem"));
         services.AddMediatR(Assembly.GetExecutingAssembly());
-       
         return services;
     }
     
@@ -39,20 +36,17 @@ public static class DependencyInjection
             {
                 var config = context.GetService<IConfiguration>();
                 var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
-            
-                configurator.Host(rabbitMQSettings.Host, "/", h =>
-                {
-                    h.Username(rabbitMQSettings.Username);
-                    h.Password(rabbitMQSettings.Password);
 
+                configurator.Host(new Uri(rabbitMQSettings.Host), h =>
+                {
                     // Configuration SSL
-                    h.UseSsl(ssl =>
+                    /*h.UseSsl(ssl =>
                     {
                         ssl.ServerName = System.Net.Dns.GetHostName();
                         ssl.AllowPolicyErrors(SslPolicyErrors.RemoteCertificateChainErrors | SslPolicyErrors.RemoteCertificateNameMismatch);
-                    });
+                    });*/
                 });
-            
+
                 // Retry policy for consuming messages
                 configurator.UseMessageRetry(retryConfig =>
                 {

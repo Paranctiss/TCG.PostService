@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
                       builder =>
                       {
                           builder
-                            .WithOrigins("http://localhost:4200") // specifying the allowed origin
+                            .WithOrigins("*") // specifying the allowed origin
                             .WithMethods("GET", "POST", "PUT", "DELETE") // defining the allowed HTTP method
                             .AllowAnyHeader(); // allowing any header to be sent
                       });
@@ -97,9 +97,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.Services.GetService<ICertificateValidationInitializer>()?.InitializeCertificateValidation();
+//app.Services.GetService<ICertificateValidationInitializer>()?.InitializeCertificateValidation();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
