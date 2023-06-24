@@ -28,6 +28,4 @@ RUN dotnet publish "TCG.PostService.API.csproj" -c Release -o /app/publish /p:Us
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY ["TCG.PostService.Persistence/keys/rabbitmq.pem", "/app/keys/"]
-RUN chmod 644 /app/keys/rabbitmq.pem
 ENTRYPOINT ["dotnet", "TCG.PostService.API.dll"]
