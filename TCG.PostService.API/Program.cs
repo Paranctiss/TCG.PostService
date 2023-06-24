@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
                       builder =>
                       {
                           builder
-                            .WithOrigins("http://localhost:8100") // specifying the allowed origin
+                            .WithOrigins("*") // specifying the allowed origin
                             .WithMethods("GET", "POST", "PUT", "DELETE") // defining the allowed HTTP method
                             .AllowAnyHeader(); // allowing any header to be sent
                       });
@@ -89,7 +89,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 

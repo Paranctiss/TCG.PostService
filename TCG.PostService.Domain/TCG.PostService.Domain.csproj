@@ -6,12 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-	<PropertyGroup>
-		<RestoreSources>$(RestoreSources);https://pkgs.dev.azure.com/ProjetCSC/_packaging/ProjetCSC/nuget/v3/index.json</RestoreSources>
-	</PropertyGroup>
-
 	<ItemGroup>
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="TCG.Common" Version="1.3.29" />
 	</ItemGroup>
 
 </Project>
