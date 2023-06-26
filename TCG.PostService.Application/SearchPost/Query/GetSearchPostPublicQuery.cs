@@ -1,13 +1,15 @@
 using MapsterMapper;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MySqlX.XDevAPI.Common;
+using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.DTO.Response;
 
 namespace TCG.PostService.Application.SearchPost.Query;
 
-public record GetSearchPostPublicQuery(string idReference, string[] idExtensions, string[] idGradings, string idUser, int pageNumber, int pageSize) : IRequest<IEnumerable<SearchPostDtoResponse>>;
+public record GetSearchPostPublicQuery(string idReference, string[] idExtensions, string[] idGradings, string idUser, int pageNumber, int pageSize, string token) : IRequest<IEnumerable<SearchPostDtoResponse>>;
 
 public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPublicQuery, IEnumerable<SearchPostDtoResponse>>
 {
@@ -15,13 +17,21 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
     private readonly ISearchPostRepository _repository;
     private readonly ILikedSearchPostRepository _likedSearchPostRepository;
     private readonly IMapper _mapper;
+    private readonly IRequestClient<UserByToken> _requestClient;
 
-    public GetSearchPostPublicQueryHandler(ILogger<GetSearchPostPublicQueryHandler> logger, ISearchPostRepository repository, ILikedSearchPostRepository likedSearchPostRepository, IMapper mapper)
+
+    public GetSearchPostPublicQueryHandler(
+        ILogger<GetSearchPostPublicQueryHandler> logger, 
+        ISearchPostRepository repository, 
+        ILikedSearchPostRepository likedSearchPostRepository, 
+        IMapper mapper, 
+        IRequestClient<UserByToken> requestClient)
     {
         _logger = logger;
         _repository = repository;
         _likedSearchPostRepository = likedSearchPostRepository;
         _mapper = mapper;
+        _requestClient = requestClient;
     }
     public async Task<IEnumerable<SearchPostDtoResponse>> Handle(GetSearchPostPublicQuery request, CancellationToken cancellationToken)
     {
@@ -43,17 +53,33 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
             }
 
             var searchPostDto = _mapper.Map<List<SearchPostDtoResponse>>(searchPosts);
-
-            foreach(SearchPostDtoResponse searchPostDtoResponse in searchPostDto)
+            if (request.token != "")
             {
-                if(_likedSearchPostRepository.IsSearchPostLiked(cancellationToken, 1, searchPostDtoResponse.Id))
+                try
                 {
-                    searchPostDtoResponse.Liked = true;
-                }
-                else
+                    var userByToken = new UserByToken(request.token, cancellationToken);
+                    var userFromAuth = await _requestClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+
+                    foreach (SearchPostDtoResponse searchPostDtoResponse in searchPostDto)
+                    {
+                        if (_likedSearchPostRepository.IsSearchPostLiked(cancellationToken, userFromAuth.Message.idUser, searchPostDtoResponse.Id))
+                        {
+                            searchPostDtoResponse.Liked = true;
+                        }
+                        else
+                        {
+                            searchPostDtoResponse.Liked = false;
+                        }
+                    }
+                }catch(Exception e)
                 {
-                    searchPostDtoResponse.Liked = false;
+
                 }
+                finally
+                {
+
+                }
+                
             }
 
             return searchPostDto;

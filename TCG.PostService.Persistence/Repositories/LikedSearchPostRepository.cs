@@ -26,7 +26,12 @@ namespace TCG.PostService.Persistence.Repositories
 
         public async Task<LikedSearchPostDtoRequest> RemoveLikedSearchPosts(LikedSearchPostDtoRequest likedSearchPost, CancellationToken cancellationToken)
         {
-            int t = await _dbContext.LikedSearchPosts.Where(s => s.SearchPostId == likedSearchPost.SearchPostId).Where(u => u.UserId == likedSearchPost.UserId).ExecuteDeleteAsync();
+            var t = await _dbContext.LikedSearchPosts.Where(s => s.SearchPostId == likedSearchPost.SearchPostId).Where(u => u.UserId == likedSearchPost.UserId).FirstOrDefaultAsync();
+            if (t != null)
+            {
+                _dbContext.LikedSearchPosts.Remove(t);
+                await _dbContext.SaveChangesAsync();
+            }
             return likedSearchPost;
         }
 

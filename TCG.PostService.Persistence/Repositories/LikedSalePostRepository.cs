@@ -26,7 +26,12 @@ namespace TCG.PostService.Persistence.Repositories
 
         public async Task<LikedSalePostDtoRequest> RemoveLikedSalePosts(LikedSalePostDtoRequest likedSalePost, CancellationToken cancellationToken)
         {
-            int t = await _dbContext.LikedSalePosts.Where(s => s.SalePostId == likedSalePost.SalePostId).Where(u => u.UserId == likedSalePost.UserId).ExecuteDeleteAsync();
+            var t = await _dbContext.LikedSalePosts.Where(s => s.SalePostId == likedSalePost.SalePostId).Where(u => u.UserId == likedSalePost.UserId).FirstOrDefaultAsync();
+            if(t != null)
+            {
+                _dbContext.LikedSalePosts.Remove(t);
+                await _dbContext.SaveChangesAsync();
+            }
             return likedSalePost;
         }
 
