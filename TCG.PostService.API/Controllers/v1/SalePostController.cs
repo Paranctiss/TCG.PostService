@@ -42,7 +42,17 @@ public class SalePostController : ControllerBase
     {
         string[] idExtensionsArray = idExtensions.Split(",");
         string[] idGradingsArray = idGradings.Split(",");
-        var salePost = await _mediator.Send(new GetSalePostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize), cancellationToken);
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        string token;
+        if(authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+           token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
+        else
+        {
+            token = "";
+        }
+        var salePost = await _mediator.Send(new GetSalePostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize, token), cancellationToken);
 
         if (salePost == null)
         {
@@ -72,6 +82,20 @@ public class SalePostController : ControllerBase
         var salePost = await _mediator.Send(new UpdateSalePostCommand(id, token), cancellationToken);
 
 
+
+        if (salePost == null)
+        {
+            return BadRequest();
+        }
+        return StatusCode(204);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        var token = authorizationContent.ToString().Substring("Bearer ".Length);
+        var salePost = await _mediator.Send(new DeleteSalePostCommand(id, token), cancellationToken);
 
         if (salePost == null)
         {

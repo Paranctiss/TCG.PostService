@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TCG.PostService.Application.SalePost.Command;
 using TCG.PostService.Application.SearchPost.Command;
 using TCG.PostService.Application.SearchPost.DTO;
 using TCG.PostService.Application.SearchPost.Query;
@@ -48,7 +49,17 @@ public class SearchPostController : ControllerBase
     {
         string[] idExtensionsArray = idExtensions.Split(",");
         string[] idGradingsArray = idGradings.Split(",");
-        var searchPost = await _mediator.Send(new GetSearchPostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize), cancellationToken);
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        string token;
+        if (authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+            token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
+        else
+        {
+            token = "";
+        }
+        var searchPost = await _mediator.Send(new GetSearchPostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize, token), cancellationToken);
 
         if (searchPost == null)
         {
@@ -84,6 +95,20 @@ public class SearchPostController : ControllerBase
             return NotFound();
         }
         return Ok(searchPost);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        var token = authorizationContent.ToString().Substring("Bearer ".Length);
+        var searchPost = await _mediator.Send(new DeleteSearchPostCommand(id, token), cancellationToken);
+
+        if (searchPost == null)
+        {
+            return BadRequest();
+        }
+        return StatusCode(204);
     }
 
 }
