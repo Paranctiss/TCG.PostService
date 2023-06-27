@@ -44,7 +44,7 @@ public class SalePostController : ControllerBase
         string[] idGradingsArray = idGradings.Split(",");
         var authorizationContent = HttpContext.Request.Headers["Authorization"];
         string token;
-        if(authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        if( authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
         {
            token = authorizationContent.ToString().Substring("Bearer ".Length);
         }

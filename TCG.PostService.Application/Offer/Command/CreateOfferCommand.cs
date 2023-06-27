@@ -131,7 +131,19 @@ namespace TCG.PostService.Application.Offer.Command
                             prixPropose = request.OfferDtoRequest.Price
                         }
                     };
-                    var offerMessage = new AddMessage(JsonSerializer.Serialize(users), JsonSerializer.Serialize(message), request.OfferDtoRequest.SalePostId);
+
+                    var merchpost = new Domain.SalePost
+                    {
+                        Id = salePost.Id,
+                        GradingId=salePost.GradingId,
+                        IdExtension=salePost.IdExtension,
+                        LibelleExtension=salePost.LibelleExtension,
+                        ItemId=salePost.ItemId,
+                        Image=salePost.Image,
+                        Name=salePost.Name,
+                        Price = salePost.Price,
+                    };
+                    var offerMessage = new AddMessage(JsonSerializer.Serialize(users), JsonSerializer.Serialize(message), request.OfferDtoRequest.SalePostId, JsonSerializer.Serialize(merchpost));
                     await _publishEndpoint.Publish(offerMessage, cancellationToken);
 
                 }, cancellationToken);
