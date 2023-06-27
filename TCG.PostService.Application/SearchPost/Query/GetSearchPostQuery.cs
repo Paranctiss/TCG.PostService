@@ -3,6 +3,7 @@ using MassTransit;
 using MassTransit.Clients;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.Command;
@@ -12,7 +13,7 @@ using TCG.PostService.Domain;
 
 namespace TCG.PostService.Application.SearchPost.Query;
 
-public record GetSearchPostQuery(Guid id) : IRequest<SearchPostDtoResponse>;
+public record GetSearchPostQuery(Guid id, string token) : IRequest<SearchPostDtoResponse>;
 
 public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, SearchPostDtoResponse>
 {
@@ -20,13 +21,17 @@ public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, Sea
     private readonly ISearchPostRepository _repository;
     private readonly IMapper _mapper;
     private readonly IRequestClient<UserById> _requestClient;
+    private readonly ILikedSearchPostRepository _likedRepository;
+    private readonly IRequestClient<UserByToken> _requestUserTokenClient;
 
-    public GetSearchPostQueryHandler(ILogger<GetSearchPostQueryHandler> logger, ISearchPostRepository repository, IMapper mapper, IRequestClient<UserById> requestClient)
+    public GetSearchPostQueryHandler(ILogger<GetSearchPostQueryHandler> logger, ISearchPostRepository repository, IMapper mapper, IRequestClient<UserById> requestClient, IRequestClient<UserByToken> requestUserTokenClient, ILikedSearchPostRepository likedRepository)
     {
         _logger = logger;
         _repository = repository;
         _mapper = mapper;
         _requestClient = requestClient;
+        _requestUserTokenClient = requestUserTokenClient;
+        _likedRepository = likedRepository;
     }
     
     public async Task<SearchPostDtoResponse> Handle(GetSearchPostQuery request, CancellationToken cancellationToken)
@@ -47,6 +52,45 @@ public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, Sea
             var searchPostDto = _mapper.Map<SearchPostDtoResponse>(searchPost);
 
             searchPostDto.Username = userFromAuth.Message.username;
+
+
+            int idUserRequesFromAuth = 0;
+            Expression<Func<Domain.SearchPost, bool>> filter;
+            if (request.token != "")
+            {
+                var userByToken = new UserByToken(request.token, cancellationToken);
+                try
+                {
+                    var userRequestFromAuth = await _requestUserTokenClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+                    if (userRequestFromAuth != null)
+                    {
+                        idUserRequesFromAuth = userRequestFromAuth.Message.idUser;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally
+                {
+
+                }
+            }
+
+            if (idUserRequesFromAuth != 0)
+            {
+
+                if (_likedRepository.IsSearchPostLiked(cancellationToken, idUserRequesFromAuth, searchPostDto.Id))
+                {
+                    searchPostDto.Liked = true;
+                }
+                else
+                {
+                    searchPostDto.Liked = false;
+                }
+            }
+
+
 
             return searchPostDto;
         }

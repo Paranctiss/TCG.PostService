@@ -29,13 +29,22 @@ public class SearchPostController : ControllerBase
         var command = new CreateSearchPostCommand(searchPostDto);
         var result = await _mediator.Send(command, cancellationToken);
 
+
+
         return CreatedAtAction(nameof(GetSearchPost), new { id = result.Id }, result);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetSearchPost(Guid id, CancellationToken cancellationToken)
     {
-        var searchPost = await _mediator.Send(new GetSearchPostQuery(id), cancellationToken);
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        string token = "";
+        if (authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+            token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
+
+        var searchPost = await _mediator.Send(new GetSearchPostQuery(id, token), cancellationToken);
 
         if (searchPost == null)
         {
@@ -50,14 +59,10 @@ public class SearchPostController : ControllerBase
         string[] idExtensionsArray = idExtensions.Split(",");
         string[] idGradingsArray = idGradings.Split(",");
         var authorizationContent = HttpContext.Request.Headers["Authorization"];
-        string token;
-        if (authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        string token = "";
+        if (authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
         {
             token = authorizationContent.ToString().Substring("Bearer ".Length);
-        }
-        else
-        {
-            token = "";
         }
         var searchPost = await _mediator.Send(new GetSearchPostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize, token), cancellationToken);
 

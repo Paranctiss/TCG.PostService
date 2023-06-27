@@ -2,6 +2,7 @@ using MapsterMapper;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SalePost.DTO.Response;
@@ -11,21 +12,25 @@ using TCG.PostService.Application.SearchPost.Query;
 namespace TCG.PostService.Application.SalePost.Query;
 
 
-public record GetSalePostQuery(Guid id) : IRequest<SalePostDtoResponse>;
+public record GetSalePostQuery(Guid id, string token) : IRequest<SalePostDtoResponse>;
 
 public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePostDtoResponse>
 {
     private readonly ILogger<GetSalePostQueryHandler> _logger;
     private readonly ISalePostRepository _repository;
     private readonly IMapper _mapper;
-    private readonly IRequestClient<UserById> _requestClient;
+    private readonly IRequestClient<UserById> _requestUserIdClient;
+    private readonly IRequestClient<UserByToken> _requestUserTokenClient;
+    private readonly ILikedSalePostRepository _likedSalePostRepository;
 
-    public GetSalePostQueryHandler(ILogger<GetSalePostQueryHandler> logger, ISalePostRepository repository, IMapper mapper, IRequestClient<UserById> requestClient)
+    public GetSalePostQueryHandler(ILogger<GetSalePostQueryHandler> logger, ISalePostRepository repository, IMapper mapper, IRequestClient<UserById> requestUserIdClient, IRequestClient<UserByToken> requestUserTokenClient, ILikedSalePostRepository likedSalePostRepository)
     {
         _logger = logger;
         _repository = repository;
         _mapper = mapper;
-        _requestClient = requestClient;
+        _requestUserIdClient = requestUserIdClient;
+        _requestUserTokenClient = requestUserTokenClient;
+        _likedSalePostRepository = likedSalePostRepository;
     }
     public async Task<SalePostDtoResponse> Handle(GetSalePostQuery request, CancellationToken cancellationToken)
     {
@@ -40,11 +45,47 @@ public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePos
             }
 
             var userById = new UserById(salePost.UserId);
-            var userFromAuth = await _requestClient.GetResponse<UserByIdResponse>(userById, cancellationToken);
+            var userFromAuth = await _requestUserIdClient.GetResponse<UserByIdResponse>(userById, cancellationToken);
 
             var salePostDtoResponse = _mapper.Map<SalePostDtoResponse>(salePost);
 
             salePostDtoResponse.Username = userFromAuth.Message.username;
+
+            int idUserRequesFromAuth = 0;
+            Expression<Func<Domain.SalePost, bool>> filter;
+            if (request.token != "")
+            {
+                var userByToken = new UserByToken(request.token, cancellationToken);
+                try
+                {
+                    var userRequestFromAuth = await _requestUserTokenClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+                    if (userRequestFromAuth != null)
+                    {
+                        idUserRequesFromAuth = userRequestFromAuth.Message.idUser;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally
+                {
+
+                }
+            }
+
+            if (idUserRequesFromAuth != 0)
+            {
+
+                    if (_likedSalePostRepository.IsSalePostLiked(cancellationToken, idUserRequesFromAuth, salePostDtoResponse.Id))
+                    {
+                        salePostDtoResponse.Liked = true;
+                    }
+                    else
+                    {
+                        salePostDtoResponse.Liked = false;
+                    }
+            }
 
             return salePostDtoResponse;
         }

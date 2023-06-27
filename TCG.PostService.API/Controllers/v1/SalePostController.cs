@@ -32,7 +32,18 @@ public class SalePostController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetSalePost(Guid id, CancellationToken cancellationToken)
     {
-        var salePost = await _mediator.Send(new GetSalePostQuery(id), cancellationToken);
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        string token;
+        if (authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+            token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
+        else
+        {
+            token = "";
+        }
+
+        var salePost = await _mediator.Send(new GetSalePostQuery(id, token), cancellationToken);
 
         return salePost != null ? Ok(salePost) : NotFound();
     }
@@ -43,14 +54,10 @@ public class SalePostController : ControllerBase
         string[] idExtensionsArray = idExtensions.Split(",");
         string[] idGradingsArray = idGradings.Split(",");
         var authorizationContent = HttpContext.Request.Headers["Authorization"];
-        string token;
+        string token = "";
         if( authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
         {
            token = authorizationContent.ToString().Substring("Bearer ".Length);
-        }
-        else
-        {
-            token = "";
         }
         var salePost = await _mediator.Send(new GetSalePostPublicQuery(idReference, idExtensionsArray, idGradingsArray, idUser, pageNumber, pageSize, token), cancellationToken);
 
@@ -94,7 +101,11 @@ public class SalePostController : ControllerBase
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var authorizationContent = HttpContext.Request.Headers["Authorization"];
-        var token = authorizationContent.ToString().Substring("Bearer ".Length);
+        string token = "";
+        if (authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+            token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
         var salePost = await _mediator.Send(new DeleteSalePostCommand(id, token), cancellationToken);
 
         if (salePost == null)
