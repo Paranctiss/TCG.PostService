@@ -142,6 +142,7 @@ namespace TCG.PostService.Application.Offer.Command
                         Image=salePost.Image,
                         Name=salePost.Name,
                         Price = salePost.Price,
+                        UserId = salePost.UserId,
                     };
                     var offerMessage = new AddMessage(JsonSerializer.Serialize(users), JsonSerializer.Serialize(message), request.OfferDtoRequest.SalePostId, JsonSerializer.Serialize(merchpost));
                     await _publishEndpoint.Publish(offerMessage, cancellationToken);
