@@ -17,6 +17,8 @@ namespace TCG.PostService.Application.Offer.Command
     {
         public offre offre { get; set; }
         public int idUserEnvoi { get; set; }
+        public int sellerId { get; set; }
+        public int buyerId { get; set; }
         public DateTime dateEnvoi { get; set; }
         public string texte { get; set; }
     }
@@ -69,6 +71,10 @@ namespace TCG.PostService.Application.Offer.Command
         {
             try
             {
+                if(request.OfferDtoRequest.SearchPostId == "null")
+                {
+                    request.OfferDtoRequest.SearchPostId = null;
+                }
                 var salePost = await _repositorySalePost.GetByGUIDAsync(new Guid(request.OfferDtoRequest.SalePostId), cancellationToken);
                 var offerExisting = await _repositoryOffer.GetOfferExistingByMerchPostId(new Guid(request.OfferDtoRequest.SalePostId), request.OfferDtoRequest.BuyerId, cancellationToken);
                 if (offerExisting != null)
@@ -83,6 +89,10 @@ namespace TCG.PostService.Application.Offer.Command
                     Price = request.OfferDtoRequest.Price,
                     SellerId = salePost.UserId
                 };
+                if(request.OfferDtoRequest.SearchPostId != null)
+                {
+                    offer.SearchPostId = new Guid(request.OfferDtoRequest.SearchPostId);
+                }
 
                 await _repositoryOffer.ExecuteInTransactionAsync(async () =>
                 {
@@ -94,12 +104,11 @@ namespace TCG.PostService.Application.Offer.Command
                     // Ajout de l'offre dans la base de données
                     var idOffer = await _repositoryOffer.CreateOffer(offer, cancellationToken);
 
+                        var userVendeurById = new UserById(salePost.UserId);
+                        var userVendeurFromAuth = await _requestClient.GetResponse<UserByIdResponse>(userVendeurById, cancellationToken);
 
-                    var userVendeurById = new UserById(salePost.UserId);
-                    var userVendeurFromAuth = await _requestClient.GetResponse<UserByIdResponse>(userVendeurById, cancellationToken);
-
-                    var userAcheteurById = new UserById(request.OfferDtoRequest.BuyerId);
-                    var userAcheteurFromAuth = await _requestClient.GetResponse<UserByIdResponse>(userAcheteurById, cancellationToken);
+                        var userAcheteurById = new UserById(request.OfferDtoRequest.BuyerId);
+                        var userAcheteurFromAuth = await _requestClient.GetResponse<UserByIdResponse>(userAcheteurById, cancellationToken);
                     
                     //Rabbit
                     var users = new List<user>
@@ -117,20 +126,43 @@ namespace TCG.PostService.Application.Offer.Command
                             id = userAcheteurFromAuth.Message.idUser,
                             userName = userAcheteurFromAuth.Message.username
                         }
-                    };  
-
-                    var message = new message
-                    {
-                        idUserEnvoi = request.OfferDtoRequest.BuyerId,
-                        dateEnvoi = DateTime.Now,
-                        texte = "",
-                        offre = new offre
-                        {
-                            id = idOffer,
-                            etat = "C",
-                            prixPropose = request.OfferDtoRequest.Price
-                        }
                     };
+                    message createdMessage;
+                    if (offer.SearchPostId == null)
+                    {
+                        createdMessage = new message
+                        {
+                            buyerId = request.OfferDtoRequest.BuyerId,
+                            sellerId = salePost.UserId,
+                            idUserEnvoi = request.OfferDtoRequest.BuyerId,
+                            dateEnvoi = DateTime.Now,
+                            texte = "",
+                            offre = new offre
+                            {
+                                id = idOffer,
+                                etat = "C",
+                                prixPropose = request.OfferDtoRequest.Price
+                            }
+                        };
+                    }
+                    else
+                    {
+                        createdMessage = new message
+                        {
+                            buyerId = request.OfferDtoRequest.BuyerId,
+                            sellerId = salePost.UserId,
+                            idUserEnvoi = salePost.UserId,
+                            dateEnvoi = DateTime.Now,
+                            texte = "",
+                            offre = new offre
+                            {
+                                id = idOffer,
+                                etat = "C",
+                                prixPropose = request.OfferDtoRequest.Price
+                            }
+                        };
+                    }
+                    
 
                     var merchpost = new Domain.SalePost
                     {
@@ -144,7 +176,7 @@ namespace TCG.PostService.Application.Offer.Command
                         Price = salePost.Price,
                         UserId = salePost.UserId,
                     };
-                    var offerMessage = new AddMessage(JsonSerializer.Serialize(users), JsonSerializer.Serialize(message), request.OfferDtoRequest.SalePostId, JsonSerializer.Serialize(merchpost));
+                    var offerMessage = new AddMessage(JsonSerializer.Serialize(users), JsonSerializer.Serialize(createdMessage), request.OfferDtoRequest.SalePostId, JsonSerializer.Serialize(merchpost));
                     await _publishEndpoint.Publish(offerMessage, cancellationToken);
 
                 }, cancellationToken);

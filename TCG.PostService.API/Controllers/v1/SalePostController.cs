@@ -23,7 +23,6 @@ public class SalePostController : ControllerBase
     [HttpPost("add")]
     public async Task<IActionResult> PostSalePost([FromBody] SalePostDtoRequest salePostDtoRequest,
         CancellationToken cancellationToken)
-
     {
         var salePost = await _mediator.Send(new CreateSalePostCommand(salePostDtoRequest), cancellationToken);
         return CreatedAtAction(nameof(GetSalePost), new { id = salePost.Id }, salePost);
