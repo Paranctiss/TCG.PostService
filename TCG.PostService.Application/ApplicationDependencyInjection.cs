@@ -3,12 +3,15 @@ using GreenPipes;
 using Mapster;
 using MapsterMapper;
 using MassTransit;
+using MassTransit.Saga;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TCG.Common.MassTransit.Messages;
 using TCG.Common.Settings;
 using TCG.PostService.Application.Consumer;
+using TCG.PostService.Application.Consumer.Events;
+using TCG.PostService.Application.Consumer.Messages;
 using TCG.PostService.Application.SalePost.DTO.Response;
 using TCG.PostService.Application.LikedSalePost.DTO.Response;
 using TCG.PostService.Application.SearchPost.DTO.Response;
@@ -30,6 +33,10 @@ public static class DependencyInjection
         serviceCollection.AddMassTransit(configure =>
         {
             configure.AddConsumer<OrderStatusChangedConsumer>();
+            configure.AddConsumer<OrderStateRollbackMessageConsumer>();
+            
+            configure.AddConsumer<BuyerTransactionsConsumer>();
+            configure.AddConsumer<OrderCreatedEventConsumer>();
             configure.AddConsumer<BuyerTransactionsConsumer>();
             configure.UsingRabbitMq((context, configurator) =>
             {
@@ -38,7 +45,6 @@ public static class DependencyInjection
                 ////On recupère la config de seeting json pour rabbitMQ
                 var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
                 configurator.Host(new Uri(rabbitMQSettings.Host));
-                configurator.ConfigureEndpoints(context);
                 // Retry policy for consuming messages
                 configurator.UseMessageRetry(retryConfig =>
                 {
@@ -50,7 +56,6 @@ public static class DependencyInjection
                 configurator.UseScheduledRedelivery(r => r.Incremental(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5)));
 
                 //Defnir comment les queues sont crées dans rabbit
-                configurator.ConfigureEndpoints(context);
                 configurator.ReceiveEndpoint("invoiceservice", e =>
                 {
                     e.UseMessageRetry(r => r.Interval(2, 3000));
@@ -61,9 +66,19 @@ public static class DependencyInjection
                     e.UseMessageRetry(r => r.Interval(2, 3000));
                     e.Consumer<BuyerTransactionsConsumer>(context);
                 });
-
-                configure.AddConsumer<BuyerTransactionsConsumer>();
-
+                
+                
+                //Event saga envoie l'event OrderStateChangedEvent et ecoute le message OrderCreated
+                configurator.ReceiveEndpoint("order-created-queue", e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(2, 3000));
+                    e.Consumer<OrderCreatedEventConsumer>(context);
+                });
+                configurator.ReceiveEndpoint("oder-rollback-message-queue", e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(2, 3000));
+                    e.Consumer<OrderStateRollbackMessageConsumer>(context);
+                });
             });
             configure.AddRequestClient<AddMessage>();
             configure.AddRequestClient<UpdateOfferInMessage>();

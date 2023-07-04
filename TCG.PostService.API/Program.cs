@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using TCG.Common.Logging;
 using TCG.Common.Versioning.SwaggerConfig;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -28,6 +29,7 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddControllers();
+builder.AddSerilogLogging();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services
     .AddApiVersioning(options =>
