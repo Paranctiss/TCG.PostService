@@ -78,7 +78,7 @@ public class CreateSalePostCommandHandler : IRequestHandler<CreateSalePostComman
                 //Parcours la liste des photos transmise avec le salepost
                 foreach (var pic in request.SalePostDtoRequest.Pictures)
                 {
-                    await _helper.SavePictureToAzure(pic.Name, pic.Base64); //Enregistre la photo sur le serveur
+                    await _helper.SavePictureToAWS(pic.Name, pic.Base64); //Enregistre la photo sur le serveur
                     var dossier = _helper.GetDossierPhoto();
 
                     //Cr�ation de l'objet photo

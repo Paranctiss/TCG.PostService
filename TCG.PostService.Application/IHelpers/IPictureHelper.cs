@@ -10,6 +10,8 @@ namespace TCG.PostService.Application.IHelpers
     public interface IPictureHelper
     {
         Task SavePictureToAzure(string nomFichier, string base64String);
+        Task SavePictureToAWS(string nomFichier, string base64String);
+
         string GetDossierPhoto();
     }
 }
