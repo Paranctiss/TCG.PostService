@@ -79,6 +79,14 @@ public class GetSearchPostQueryHandler : IRequestHandler<GetSearchPostQuery, Sea
 
             if (idUserRequesFromAuth != 0)
             {
+                if (searchPost.UserId == idUserRequesFromAuth)
+                {
+                    searchPostDto.IsOwner = true;
+                }
+                else
+                {
+                    searchPostDto.IsOwner = false;
+                }
 
                 if (_likedRepository.IsSearchPostLiked(cancellationToken, idUserRequesFromAuth, searchPostDto.Id))
                 {

@@ -27,7 +27,13 @@ public class GetUserSearchPostQueryHandler : IRequestHandler<GetUserSearchPostQu
     {
         try
         {
-            var searchPosts = await _repository.GetLastUserSearchPostAsync(request.id, request.nbMax, cancellationToken);
+            var searchPosts = await _repository.GetLastUserSearchPostAsync(
+                request.id, 
+                request.nbMax, 
+                cancellationToken,
+                orderBy: x => x.CreatedAt,
+                descending: true,
+                filter: x => x.IsPublic);
 
             if (searchPosts == null)
             {

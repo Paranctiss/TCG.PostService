@@ -3,6 +3,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MySqlX.XDevAPI.Common;
+using System.Linq.Expressions;
 using TCG.Common.MassTransit.Messages;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.DTO.Response;
@@ -37,6 +38,47 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
     {
         try
         {
+            bool isOwner = false;
+            int idUserFromAuth = 0;
+
+            Expression<Func<Domain.SearchPost, bool>> filter;
+            if (request.token != "")
+            {
+                var userByToken = new UserByToken(request.token, cancellationToken);
+                try
+                {
+                    var userFromAuth = await _requestClient.GetResponse<UserByTokenResponse>(userByToken, cancellationToken);
+                    if (userFromAuth != null)
+                    {
+                        idUserFromAuth = userFromAuth.Message.idUser;
+                        if (idUserFromAuth == int.Parse(request.idUser))
+                        {
+                            isOwner = true;
+                        }
+                        else
+                        {
+                            isOwner = false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally
+                {
+
+                }
+            }
+            if (isOwner)
+            {
+                filter = x => x.StatePostId == 'C';
+            }
+            else
+            {
+                filter = x => x.IsPublic && x.StatePostId == 'C';
+            }
+
             var searchPosts = await _repository.GetAllSearchPostPublicAsync(
                 request.idReference, 
                 request.idExtensions, 
@@ -44,7 +86,10 @@ public class GetSearchPostPublicQueryHandler : IRequestHandler<GetSearchPostPubl
                 request.idUser,
                 request.pageNumber,
                 request.pageSize,
-                cancellationToken);
+                cancellationToken,
+                orderBy: x => x.CreatedAt,
+                descending: true,
+                filter: filter);
 
             if (searchPosts == null)
             {

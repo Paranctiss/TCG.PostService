@@ -9,12 +9,14 @@ public class SearchPost
     public decimal Price { get; set; }
     public string Remarks { get; set; }
     public bool IsPublic { get; set; }
+    public string AccessCode { get; set; }
     public string Image { get; set; }
     public string Name { get; set; }
     public string IdExtension { get; set; }
     public string LibelleExtension { get; set; }
     public ICollection<OfferPost> OfferPosts { get; set; }
     public virtual Grading Grading { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
     public int GradingId { get; set; }
 
     [Column(TypeName = "char(1)")]

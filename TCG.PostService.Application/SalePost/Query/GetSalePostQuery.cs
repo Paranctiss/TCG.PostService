@@ -76,6 +76,14 @@ public class GetSalePostQueryHandler : IRequestHandler<GetSalePostQuery, SalePos
 
             if (idUserRequesFromAuth != 0)
             {
+                if(salePost.UserId == idUserRequesFromAuth)
+                {
+                    salePostDtoResponse.IsOwner = true;
+                }
+                else
+                {
+                    salePostDtoResponse.IsOwner = false;
+                }
 
                     if (_likedSalePostRepository.IsSalePostLiked(cancellationToken, idUserRequesFromAuth, salePostDtoResponse.Id))
                     {

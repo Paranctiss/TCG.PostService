@@ -6,6 +6,7 @@ using TCG.PostService.Application.SalePost.Command;
 using TCG.PostService.Application.SearchPost.Command;
 using TCG.PostService.Application.SearchPost.DTO;
 using TCG.PostService.Application.SearchPost.Query;
+using TCG.PostService.Domain;
 
 namespace TCG.PostService.API.Controllers.v1;
 
@@ -50,7 +51,40 @@ public class SearchPostController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(searchPost);
+        if (!searchPost.IsPublic && !searchPost.IsOwner)
+        {
+            return Unauthorized();
+        }
+        else
+        {
+            return Ok(searchPost);
+        }
+    }
+
+    [HttpGet("{id}/{accessCode}")]
+    public async Task<IActionResult> GetSearchPost(Guid id, CancellationToken cancellationToken, string accessCode = "")
+    {
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        string token = "";
+        if (authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+            token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
+
+        var searchPost = await _mediator.Send(new GetSearchPostQuery(id, token), cancellationToken);
+
+        if (searchPost == null)
+        {
+            return NotFound();
+        }
+        if (searchPost.AccessCode != accessCode && !searchPost.IsPublic && !searchPost.IsOwner)
+        {
+            return Unauthorized();
+        }
+        else
+        {
+            return Ok(searchPost);
+        }
     }
 
     [HttpGet("public")]
@@ -99,7 +133,7 @@ public class SearchPostController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(searchPost);
+        return Ok(searchPost.AccessCode);
     }
 
     [HttpDelete("{id}")]

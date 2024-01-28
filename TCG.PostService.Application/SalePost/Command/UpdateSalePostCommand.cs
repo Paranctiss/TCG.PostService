@@ -46,7 +46,8 @@ public class UpdateSalePostHandler : IRequestHandler<UpdateSalePostCommand, Doma
         {
 
             var salePost = await _repository.GetByGUIDAsync(request.IdPost, cancellationToken);
-
+            salePost.AccessCode = new Random().Next(100000, 1000000).ToString();
+            
             if (salePost == null)
             {
                 _logger.LogWarning("Sale post with id {SalePostId} not found", request.IdPost);

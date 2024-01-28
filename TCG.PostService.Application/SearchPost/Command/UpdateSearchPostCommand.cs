@@ -14,6 +14,7 @@ using TCG.Common.MassTransit.Messages;
 using TCG.Common.Middlewares.MiddlewareException;
 using TCG.PostService.Application.Contracts;
 using TCG.PostService.Application.SearchPost.DTO.Response;
+using TCG.PostService.Domain;
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
 
 namespace TCG.PostService.Application.SearchPost.Command;
@@ -49,6 +50,7 @@ public class UpdateSearchPostHandler : IRequestHandler<UpdateSearchPostCommand, 
         {
 
             var searchPost = await _repository.GetByGUIDAsync(request.IdPost, cancellationToken);
+            searchPost.AccessCode = new Random().Next(100000, 1000000).ToString();
 
             if (searchPost == null)
             {

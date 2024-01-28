@@ -44,7 +44,48 @@ public class SalePostController : ControllerBase
 
         var salePost = await _mediator.Send(new GetSalePostQuery(id, token), cancellationToken);
 
-        return salePost != null ? Ok(salePost) : NotFound();
+        if (salePost == null)
+        {
+            return NotFound();
+        }
+        if (!salePost.IsPublic && !salePost.IsOwner)
+        {
+            return Unauthorized();
+        }
+        else
+        {
+            return Ok(salePost);
+        }
+    }
+
+    [HttpGet("{id}/{accessCode}")]
+    public async Task<IActionResult> GetSalePost(Guid id, CancellationToken cancellationToken, string accessCode = "")
+    {
+        var authorizationContent = HttpContext.Request.Headers["Authorization"];
+        string token;
+        if (authorizationContent.ToString().Length > 0 && authorizationContent.ToString().Substring("Bearer ".Length) != "")
+        {
+            token = authorizationContent.ToString().Substring("Bearer ".Length);
+        }
+        else
+        {
+            token = "";
+        }
+
+        var salePost = await _mediator.Send(new GetSalePostQuery(id, token), cancellationToken);
+
+        if(salePost == null )
+        {
+            return NotFound();
+        }
+        if(salePost.AccessCode != accessCode && !salePost.IsPublic && !salePost.IsOwner)
+        {
+            return Unauthorized();
+        }
+        else
+        {
+            return Ok(salePost);
+        }
     }
 
     [HttpGet("public")]
@@ -93,7 +134,7 @@ public class SalePostController : ControllerBase
         {
             return BadRequest();
         }
-        return StatusCode(204);
+        return Ok(salePost.AccessCode);
     }
 
     [HttpDelete("{id}")]

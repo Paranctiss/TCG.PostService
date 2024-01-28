@@ -9,8 +9,12 @@ public class SearchPostDtoResponse
     public decimal Price { get; set; }
     public string Remarks { get; set; }
     public bool IsPublic { get; set; }
+    public string AccessCode { get; set; }
+    public bool IsOwner { get; set; }
     public char StatePostId { get; set; }
     public int UserId { get; set; }
+
+    public DateTime CreatedAt { get; set; }
     public string Image { get; set; }
     public string Name { get; set; }
     public string Username { get; set; }

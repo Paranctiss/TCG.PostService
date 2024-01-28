@@ -25,8 +25,11 @@ public interface ISalePostRepository : IRepository<Domain.SalePost>
         bool descending = true,
         Expression<Func<Domain.SalePost, bool>> filter = null);
 
-    Task<Domain.SalePost> GetSingleSalePostAsync(CancellationToken cancellationToken, Guid id);
+    Task<Domain.SalePost> GetSingleSalePostAsync(
+        CancellationToken cancellationToken, 
+        Guid id);
 
-    Task<IEnumerable<MerchPostResponse>> GetAllBuyerSalePostName(CancellationToken cancellationToken,
+    Task<IEnumerable<MerchPostResponse>> GetAllBuyerSalePostName(
+        CancellationToken cancellationToken,
         IEnumerable<Guid> id, int buyerId);
 }

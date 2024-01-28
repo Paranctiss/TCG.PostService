@@ -93,7 +93,7 @@ public class GetSalePostPublicQueryHandler : IRequestHandler<GetSalePostPublicQu
 
             if (salePost == null)
             {
-                _logger.LogWarning("No public search post found");
+                _logger.LogWarning("No public sale post found");
                 return null;
             }
 
